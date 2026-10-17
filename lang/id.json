@@ -1,0 +1,23 @@
+{
+    "A new verification link has been sent to the email address you provided during registration.": "Tautan verifikasi baru telah dikirim ke alamat email Anda.",
+    "Confirm": "Konfirmasi",
+    "Confirm Password": "Konfirmasi Kata Sandi",
+    "Email": "Email",
+    "Email Password Reset Link": "Kirim Tautan Atur Ulang Kata Sandi",
+    "Forbidden": "Akses Ditolak",
+    "Forgot your password?": "Lupa kata sandi?",
+    "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "Lupa kata sandi? Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk membuat kata sandi baru.",
+    "Log Out": "Keluar",
+    "Log in": "Masuk",
+    "Not Found": "Halaman Tidak Ditemukan",
+    "Page Expired": "Sesi Kedaluwarsa",
+    "Password": "Kata Sandi",
+    "Remember me": "Ingat saya",
+    "Resend Verification Email": "Kirim Ulang Email Verifikasi",
+    "Reset Password": "Atur Ulang Kata Sandi",
+    "Server Error": "Terjadi Kesalahan Server",
+    "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.": "Sebelum mulai, verifikasi alamat email Anda melalui tautan yang baru kami kirim. Jika belum menerima email, kami dapat mengirimkannya lagi.",
+    "This is a secure area of the application. Please confirm your password before continuing.": "Ini area aman aplikasi. Konfirmasi kata sandi Anda sebelum melanjutkan.",
+    "Too Many Requests": "Terlalu Banyak Permintaan",
+    "Unauthorized": "Tidak Terautentikasi"
+}
