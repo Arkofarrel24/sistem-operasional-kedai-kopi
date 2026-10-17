@@ -23,7 +23,10 @@ class ProductController extends Controller
 
         $products = Product::query()
             ->with('category')
-            ->withCount('recipes')
+            ->withCount([
+                'recipes',
+                'recipes as inactive_ingredients_count' => fn ($query) => $query->whereRelation('ingredient', 'is_active', false),
+            ])
             ->when($filters['category'] ?? null, fn ($query, $categoryId) => $query->where('category_id', $categoryId))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('is_active', $status === 'active'))
             ->orderBy('name')

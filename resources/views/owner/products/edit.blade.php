@@ -28,7 +28,12 @@
                     @foreach ($product->recipes as $recipe)
                         @php($rowErrors = $errors->getBag('recipe-'.$recipe->id))
                         <li class="flex flex-wrap items-center gap-3 py-3">
-                            <span class="min-w-0 flex-1 font-medium">{{ $recipe->ingredient->name }}</span>
+                            <span class="min-w-0 flex-1 font-medium">
+                                {{ $recipe->ingredient->name }}
+                                @unless ($recipe->ingredient->is_active)
+                                    <span class="ml-1 rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700">Nonaktif</span>
+                                @endunless
+                            </span>
                             <form novalidate method="POST" action="{{ route('owner.products.recipes.update', [$product, $recipe]) }}" class="flex items-center gap-2">
                                 @csrf
                                 @method('PUT')
@@ -60,7 +65,7 @@
                             <option value="">Pilih bahan</option>
                             @foreach ($availableIngredients as $ingredient)
                                 <option value="{{ $ingredient->id }}" @selected($errors->recipe->any() && old('ingredient_id') == $ingredient->id)>
-                                    {{ $ingredient->name }} ({{ $ingredient->unit->label() }})
+                                    {{ $ingredient->name }} ({{ $ingredient->unit->label() }}){{ $ingredient->is_active ? '' : ' (nonaktif)' }}
                                 </option>
                             @endforeach
                         </x-select-input>

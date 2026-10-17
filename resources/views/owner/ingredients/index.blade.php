@@ -18,7 +18,12 @@
                 @forelse ($ingredients as $ingredient)
                     @php($low = $ingredient->isBelowMinimum())
                     <tr>
-                        <td class="px-4 py-3 font-medium">{{ $ingredient->name }}</td>
+                        <td class="px-4 py-3 font-medium">
+                            {{ $ingredient->name }}
+                            @unless ($ingredient->is_active)
+                                <span class="ml-1 rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">Nonaktif</span>
+                            @endunless
+                        </td>
                         <td @class(['px-4 py-3 text-right tabular-nums', 'font-semibold text-red-600' => $low])>
                             {{ qty($ingredient->current_stock) }} {{ $ingredient->unit->label() }}
                             @if ($low)

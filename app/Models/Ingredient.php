@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * current_stock is intentionally not fillable: it may only change through StockService.
  */
-#[Fillable(['name', 'unit', 'min_stock', 'cost_per_unit'])]
+#[Fillable(['name', 'unit', 'min_stock', 'cost_per_unit', 'is_active'])]
 class Ingredient extends Model
 {
     /** @use HasFactory<IngredientFactory> */
@@ -26,8 +26,18 @@ class Ingredient extends Model
             'current_stock' => 'decimal:2',
             'min_stock' => 'decimal:2',
             'cost_per_unit' => 'decimal:2',
+            'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'is_active' => true,
+    ];
 
     public function recipes(): HasMany
     {

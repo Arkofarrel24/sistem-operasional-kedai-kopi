@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
         ]);
+
+        // Check the role before route model binding, so a wrong role always gets 403
+        // (not a 404 that reveals which ids exist).
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureUserHasRole::class);
 
         // Logged-in users who open a guest page (e.g. /login) go to their role's home.
         $middleware->redirectUsersTo(fn (Request $request) => $request->user()->homeUrl());

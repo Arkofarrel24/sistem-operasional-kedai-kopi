@@ -42,6 +42,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);

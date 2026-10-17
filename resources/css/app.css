@@ -5,3 +5,43 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* The POS body disables text selection for touch; fields must stay typeable (iOS Safari). */
+input,
+textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Receipts: when printing, show only the receipt at thermal-printer width. */
+@media print {
+    @page {
+        margin: 4mm;
+    }
+
+    html,
+    body {
+        height: auto !important;
+        overflow: visible !important;
+        background: #fff !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .receipt-printable,
+    .receipt-printable * {
+        visibility: visible !important;
+    }
+
+    .receipt-printable {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 72mm;
+        max-width: none;
+        padding: 0;
+        box-shadow: none;
+    }
+}

@@ -92,6 +92,7 @@ Integrasi pembayaran online, multi-outlet, order online pelanggan, manajemen sup
 5. Setiap perubahan stok wajib tercatat di `stock_movements`. Kolom `ingredients.current_stock` hanya diubah melalui service stok, bukan langsung dari controller.
 6. Menu tanpa resep tidak bisa dijual (tidak muncul di POS) — mencegah stok tidak terlacak.
 7. Menu nonaktif tidak muncul di POS tetapi tetap ada di laporan historis.
+8. Bahan dapat dinonaktifkan (`ingredients.is_active`). Menu yang resepnya memakai minimal satu bahan nonaktif tidak muncul di POS dan ditolak saat checkout, tetapi tetap ada di laporan historis.
 
 ---
 
@@ -138,6 +139,7 @@ erDiagram
         decimal current_stock
         decimal min_stock
         decimal cost_per_unit
+        boolean is_active
         timestamps
     }
     recipes {
@@ -188,6 +190,7 @@ Catatan desain:
 - `recipes` memiliki unique index `(product_id, ingredient_id)`.
 - `stock_movements` adalah sumber kebenaran; `current_stock` adalah cache yang harus sama dengan `SUM(quantity)` per bahan. Sediakan perintah artisan untuk mengecek konsistensinya.
 - Index pada `sales.created_at` dan `sales.status` untuk laporan.
+- Nomor invoice diambil dari tabel bantu `invoice_sequences` (`date` PK, `last_number`): satu baris penghitung per hari (zona Asia/Jakarta). Baris hari itu dibuat sebelum transaksi checkout dimulai; di dalam transaksi penghitung dinaikkan dengan satu `UPDATE` yang mengunci baris itu sampai commit, sehingga checkout bersamaan antre dan tidak pernah mendapat nomor yang sama. Ditambah unique index pada `sales.invoice_no`. Checkout yang gagal ikut me-rollback penghitungnya, sehingga nomor tidak bolong.
 
 ---
 

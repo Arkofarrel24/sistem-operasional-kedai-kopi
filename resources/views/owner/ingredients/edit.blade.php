@@ -37,6 +37,13 @@
                 </div>
             </div>
 
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                       @checked(old('is_active', $ingredient->is_active))>
+                <span class="text-sm">Aktif (bahan nonaktif membuat menu yang memakainya tidak tampil di kasir)</span>
+            </label>
+            <x-input-error :messages="$errors->get('is_active')" class="mt-2" />
+
             <div class="flex items-center gap-3">
                 <x-primary-button>Simpan</x-primary-button>
                 <a href="{{ route('owner.ingredients.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>

@@ -16,17 +16,29 @@
     {{-- Full-screen, touch-first layout for tablets: no sidebar, large tap targets, no page scroll. --}}
     <body class="h-dvh overflow-hidden font-sans antialiased bg-stone-100 text-stone-900 select-none [-webkit-tap-highlight-color:transparent]">
         <div class="flex h-full flex-col">
-            <header class="flex h-16 shrink-0 items-center justify-between gap-4 bg-stone-900 px-4 text-white sm:px-6">
+            <header class="flex h-16 shrink-0 items-center justify-between gap-3 bg-stone-900 px-4 text-white print:hidden sm:px-6">
                 <div class="flex items-center gap-3">
-                    <x-application-logo class="h-8 w-8 text-amber-400" />
-                    <div class="leading-tight">
+                    <x-application-logo class="h-8 w-8 shrink-0 text-amber-400" />
+                    <div class="hidden leading-tight sm:block">
                         <p class="text-lg font-semibold">{{ config('app.name') }}</p>
                         <p class="text-xs text-stone-400">{{ now()->translatedFormat('j M Y') }}</p>
                     </div>
                 </div>
 
+                <nav class="flex items-center gap-1 rounded-xl bg-stone-800 p-1" aria-label="Kasir">
+                    @foreach (['pos.index' => 'Kasir', 'pos.history' => 'Riwayat'] as $route => $label)
+                        @php($active = request()->routeIs($route) || ($route === 'pos.history' && request()->routeIs('pos.sales.*')))
+                        <a href="{{ route($route) }}" @if ($active) aria-current="page" @endif
+                           @class([
+                               'flex h-10 items-center rounded-lg px-4 text-base font-medium',
+                               'bg-stone-100 text-stone-900' => $active,
+                               'text-stone-300 active:bg-stone-700' => ! $active,
+                           ])>{{ $label }}</a>
+                    @endforeach
+                </nav>
+
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <div class="text-right leading-tight">
+                    <div class="hidden text-right leading-tight md:block">
                         <p class="max-w-[12rem] truncate text-base font-medium">{{ auth()->user()->name }}</p>
                         <p class="text-xs text-stone-400">{{ auth()->user()->role->label() }}</p>
                     </div>

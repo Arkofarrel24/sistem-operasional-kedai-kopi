@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Ingredient;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\User;
@@ -111,4 +112,16 @@ test('owner can open the product edit page with its recipe', function () {
         ->get(route('owner.products.edit', $product))
         ->assertOk()
         ->assertSee($recipe->ingredient->name);
+});
+
+test('products using an inactive ingredient are flagged in the list', function () {
+    $active = Ingredient::factory()->create();
+    $inactive = Ingredient::factory()->create(['is_active' => false]);
+    productWithRecipe('Caramel Latte', 28000, [[$active, 18], [$inactive, 20]], ['category_id' => $this->category->id]);
+    productWithRecipe('Espresso', 15000, [[$active, 18]], ['category_id' => $this->category->id]);
+
+    $response = $this->actingAs($this->owner)->get(route('owner.products.index'))->assertOk();
+
+    $response->assertSeeInOrder(['Caramel Latte', 'Bahan nonaktif', 'Espresso']);
+    expect(substr_count($response->getContent(), 'Bahan nonaktif'))->toBe(1);
 });

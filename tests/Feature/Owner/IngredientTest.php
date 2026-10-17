@@ -90,6 +90,7 @@ test('owner can update an ingredient but not its unit or stock', function () {
             'current_stock' => '999999',
             'min_stock' => '2000',
             'cost_per_unit' => '19.5',
+            'is_active' => '1',
         ])
         ->assertRedirect(route('owner.ingredients.index'));
 
@@ -106,4 +107,28 @@ test('owner can open the ingredient forms', function () {
 
     $this->actingAs($this->owner)->get(route('owner.ingredients.create'))->assertOk();
     $this->actingAs($this->owner)->get(route('owner.ingredients.edit', $ingredient))->assertOk();
+});
+
+test('owner can deactivate and reactivate an ingredient', function () {
+    $ingredient = Ingredient::factory()->create(['name' => 'Sirup Karamel', 'unit' => Unit::Ml]);
+    $data = ['name' => 'Sirup Karamel', 'min_stock' => '200', 'cost_per_unit' => '60'];
+
+    // Unchecked checkbox: the field is not sent at all.
+    $this->actingAs($this->owner)->put(route('owner.ingredients.update', $ingredient), $data)->assertSessionHasNoErrors();
+    expect($ingredient->refresh()->is_active)->toBeFalse();
+
+    $this->actingAs($this->owner)->get(route('owner.ingredients.index'))->assertSeeInOrder(['Sirup Karamel', 'Nonaktif']);
+
+    $this->actingAs($this->owner)->put(route('owner.ingredients.update', $ingredient), $data + ['is_active' => '1']);
+    expect($ingredient->refresh()->is_active)->toBeTrue();
+});
+
+test('new ingredients are active unless unchecked', function () {
+    $base = ['unit' => 'ml', 'initial_stock' => '0', 'min_stock' => '0', 'cost_per_unit' => '1'];
+
+    $this->actingAs($this->owner)->post(route('owner.ingredients.store'), $base + ['name' => 'Aktif', 'is_active' => '1']);
+    $this->actingAs($this->owner)->post(route('owner.ingredients.store'), $base + ['name' => 'Tidak Aktif']);
+
+    expect(Ingredient::where('name', 'Aktif')->value('is_active'))->toBeTruthy()
+        ->and(Ingredient::where('name', 'Tidak Aktif')->value('is_active'))->toBeFalsy();
 });

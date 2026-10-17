@@ -124,5 +124,5 @@ test('invalid recipe quantity update is reported under that recipe row', functio
         ->getContent();
 
     // The message sits inside that recipe's row.
-    expect($html)->toMatch('/Biji Kopi<\/span>.*?Jumlah wajib diisi\..*?<\/li>/s');
+    expect($html)->toMatch('/Biji Kopi\s*<\/span>.*?Jumlah wajib diisi\..*?<\/li>/s');
 });

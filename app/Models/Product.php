@@ -43,9 +43,25 @@ class Product extends Model
             ->withTimestamps();
     }
 
+    public function saleItems(): HasMany
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Products the POS may sell: active, with a recipe, and no inactive ingredient in that recipe
+     * (PLAN.md rules 6, 7 and 8).
+     */
+    public function scopeSellable(Builder $query): void
+    {
+        $query->where('is_active', true)
+            ->whereHas('recipes')
+            ->whereDoesntHave('recipes.ingredient', fn (Builder $ingredient) => $ingredient->where('is_active', false));
     }
 
     /**
