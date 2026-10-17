@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Owner\CategoryController;
+use App\Http\Controllers\Owner\IngredientController;
+use App\Http\Controllers\Owner\ProductController;
+use App\Http\Controllers\Owner\RecipeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +21,13 @@ Route::middleware(['auth', 'role:owner'])
     ->group(function () {
         Route::view('/dashboard', 'owner.dashboard')->name('dashboard');
 
+        // Master data. Products and ingredients are deactivated/kept rather than deleted (history refers to them).
+        Route::resource('categories', CategoryController::class)->except('show');
+        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+        Route::resource('products.recipes', RecipeController::class)->only(['store', 'update', 'destroy'])->scoped();
+        Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
+
         // Placeholders until the related phases are built.
-        Route::view('/products', 'owner.placeholder', ['title' => 'Menu'])->name('products.index');
-        Route::view('/ingredients', 'owner.placeholder', ['title' => 'Bahan'])->name('ingredients.index');
         Route::view('/stock', 'owner.placeholder', ['title' => 'Stok'])->name('stock.index');
         Route::view('/reports', 'owner.placeholder', ['title' => 'Laporan'])->name('reports.index');
         Route::view('/users', 'owner.placeholder', ['title' => 'Pengguna'])->name('users.index');
