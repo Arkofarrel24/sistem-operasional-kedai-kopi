@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StockStatus;
 use App\Enums\Unit;
 use Database\Factories\IngredientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -59,5 +60,25 @@ class Ingredient extends Model
     public function isBelowMinimum(): bool
     {
         return bccomp($this->current_stock, $this->min_stock, 2) < 0;
+    }
+
+    /**
+     * Out when nothing is left, low when below the minimum, otherwise ok.
+     */
+    public function stockStatus(): StockStatus
+    {
+        return match (true) {
+            bccomp($this->current_stock, '0', 2) <= 0 => StockStatus::Out,
+            $this->isBelowMinimum() => StockStatus::Low,
+            default => StockStatus::Ok,
+        };
+    }
+
+    /**
+     * Stock value at the current purchase price.
+     */
+    public function stockValue(): string
+    {
+        return bcmul($this->current_stock, $this->cost_per_unit, 2);
     }
 }

@@ -1,8 +1,8 @@
 <x-pos-layout>
     <div class="h-full overflow-y-auto px-4 py-6 sm:px-6">
         <div class="mx-auto max-w-3xl">
-            <h1 class="text-xl font-semibold">Riwayat hari ini</h1>
-            <p class="mt-1 text-base text-stone-600">Transaksi yang Anda catat pada {{ today()->translatedFormat('j M Y') }}.</p>
+            <h1 class="text-center text-xl font-semibold">Riwayat hari ini</h1>
+            <p class="mt-1 text-center text-base text-stone-600">Transaksi yang Anda catat pada {{ today()->translatedFormat('j M Y') }}.</p>
 
             @if ($sales->isEmpty())
                 <div class="mt-6 rounded-2xl bg-white p-10 text-center ring-1 ring-inset ring-stone-200">

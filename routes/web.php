@@ -4,6 +4,12 @@ use App\Http\Controllers\Owner\CategoryController;
 use App\Http\Controllers\Owner\IngredientController;
 use App\Http\Controllers\Owner\ProductController;
 use App\Http\Controllers\Owner\RecipeController;
+use App\Http\Controllers\Owner\RestockController;
+use App\Http\Controllers\Owner\SaleController as OwnerSaleController;
+use App\Http\Controllers\Owner\StockAdjustmentController;
+use App\Http\Controllers\Owner\StockController;
+use App\Http\Controllers\Owner\VoidSaleController;
+use App\Http\Controllers\Owner\WasteController;
 use App\Http\Controllers\Pos\SaleController;
 use App\Http\Controllers\Pos\SaleHistoryController;
 use Illuminate\Http\Request;
@@ -29,8 +35,22 @@ Route::middleware(['auth', 'role:owner'])
         Route::resource('products.recipes', RecipeController::class)->only(['store', 'update', 'destroy'])->scoped();
         Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
 
+        // Stock: every change goes through StockService (PLAN.md rule 5).
+        Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+        Route::get('/stock/{ingredient}', [StockController::class, 'show'])->name('stock.show');
+        Route::get('/stock/{ingredient}/restock', [RestockController::class, 'create'])->name('stock.restock.create');
+        Route::post('/stock/{ingredient}/restock', [RestockController::class, 'store'])->name('stock.restock.store');
+        Route::get('/stock/{ingredient}/adjustment', [StockAdjustmentController::class, 'create'])->name('stock.adjustment.create');
+        Route::post('/stock/{ingredient}/adjustment', [StockAdjustmentController::class, 'store'])->name('stock.adjustment.store');
+        Route::get('/stock/{ingredient}/waste', [WasteController::class, 'create'])->name('stock.waste.create');
+        Route::post('/stock/{ingredient}/waste', [WasteController::class, 'store'])->name('stock.waste.store');
+
+        // Sales and void.
+        Route::get('/sales', [OwnerSaleController::class, 'index'])->name('sales.index');
+        Route::get('/sales/{sale}', [OwnerSaleController::class, 'show'])->name('sales.show');
+        Route::post('/sales/{sale}/void', VoidSaleController::class)->name('sales.void');
+
         // Placeholders until the related phases are built.
-        Route::view('/stock', 'owner.placeholder', ['title' => 'Stok'])->name('stock.index');
         Route::view('/reports', 'owner.placeholder', ['title' => 'Laporan'])->name('reports.index');
         Route::view('/users', 'owner.placeholder', ['title' => 'Pengguna'])->name('users.index');
     });

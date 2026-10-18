@@ -2,86 +2,12 @@
 
 use App\Enums\PaymentMethod;
 use App\Enums\Unit;
-use App\Exceptions\InsufficientStockException;
 use App\Models\Ingredient;
 use App\Models\Sale;
 use App\Models\User;
-use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 
-/*
- * Real concurrency: every checkout runs in its own forked PHP process with its own MySQL
- * connection, against committed data. The parent first holds a lock on the contended row so
- * that all children are guaranteed to be inside checkout() at the same time, then releases it.
- */
-
-beforeEach(function () {
-    if (! function_exists('pcntl_fork') || ! function_exists('posix_kill')) {
-        $this->markTestSkipped('pcntl and posix extensions are required.');
-    }
-
-    $this->outcomes = storage_path('framework/testing/concurrency-'.uniqid());
-    File::ensureDirectoryExists($this->outcomes);
-});
-
-afterEach(function () {
-    File::deleteDirectory($this->outcomes);
-});
-
-/**
- * Fork one child per checkout; each waits for the go signal, checks out, writes its outcome and dies.
- *
- * @param  list<callable(): mixed>  $checkouts
- * @param  callable(Connection): void  $holdLock  runs in the parent before the go signal
- * @return list<string> outcomes: "ok:<invoice>", "insufficient" or "error:<message>"
- */
-function runConcurrently(string $dir, array $checkouts, callable $holdLock): array
-{
-    $go = "{$dir}/go";
-
-    // Children must never share the parent's MySQL socket.
-    DB::disconnect();
-
-    $children = [];
-    foreach ($checkouts as $index => $checkout) {
-        $pid = pcntl_fork();
-
-        if ($pid === 0) {
-            $outcome = 'error:not started';
-            try {
-                while (! file_exists($go)) {
-                    usleep(5_000);
-                }
-                $outcome = 'ok:'.$checkout()->invoice_no;
-            } catch (InsufficientStockException) {
-                $outcome = 'insufficient';
-            } catch (Throwable $exception) {
-                $outcome = 'error:'.$exception->getMessage();
-            }
-            file_put_contents("{$dir}/{$index}", $outcome);
-            posix_kill(getmypid(), SIGKILL); // skip PHPUnit/Laravel shutdown handlers in the child
-        }
-
-        $children[] = $pid;
-    }
-
-    // Parent: take the contended lock on a separate connection, release the children, let them pile up.
-    config(['database.connections.lock_holder' => config('database.connections.'.config('database.default'))]);
-    $lockHolder = DB::connection('lock_holder');
-    $lockHolder->beginTransaction();
-    $holdLock($lockHolder);
-    touch($go);
-    usleep(1_000_000);
-    $lockHolder->rollBack();
-    DB::purge('lock_holder');
-
-    foreach ($children as $pid) {
-        pcntl_waitpid($pid, $status);
-    }
-
-    return collect($checkouts)->keys()->map(fn ($index) => @file_get_contents("{$dir}/{$index}") ?: 'error:no outcome')->all();
-}
+// Real concurrency: see runConcurrently() in tests/Pest.php.
 
 test('parallel checkouts on the same ingredient never oversell it', function () {
     $cashier = User::factory()->cashier()->create();
@@ -89,7 +15,6 @@ test('parallel checkouts on the same ingredient never oversell it', function () 
     $espresso = productWithRecipe('Espresso', 15000, [[$coffee, 18]]);
 
     $outcomes = runConcurrently(
-        $this->outcomes,
         array_fill(0, 6, fn () => checkout(User::find($cashier->id), [[$espresso, 1]])),
         fn ($connection) => $connection->table('ingredients')->where('id', $coffee->id)->lockForUpdate()->first(),
     );
@@ -120,7 +45,6 @@ test('parallel checkouts get unique, gap-free invoice numbers', function () {
     $date = now()->toDateString();
 
     $outcomes = runConcurrently(
-        $this->outcomes,
         $products->map(fn ($product) => fn () => checkout(User::find($cashier->id), [[$product, 1]]))->all(),
         fn ($connection) => $connection->table('invoice_sequences')->where('date', $date)->lockForUpdate()->first(),
     );
@@ -145,7 +69,6 @@ test('parallel first checkouts of the day create the counter row only once', fun
     expect(DB::table('invoice_sequences')->where('date', $date)->exists())->toBeFalse();
 
     $outcomes = runConcurrently(
-        $this->outcomes,
         $products->map(fn ($product) => fn () => checkout(User::find($cashier->id), [[$product, 1]]))->all(),
         // An uncommitted insert of today's row makes every child wait on the same new key; it is rolled back.
         fn ($connection) => $connection->table('invoice_sequences')->insert(['date' => $date, 'last_number' => 0]),

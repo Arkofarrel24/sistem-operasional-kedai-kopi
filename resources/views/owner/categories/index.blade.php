@@ -10,17 +10,17 @@
             <thead class="bg-stone-50 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">
                 <tr>
                     <th class="px-4 py-3">Nama</th>
-                    <th class="px-4 py-3 text-right">Jumlah Menu</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
+                    <th class="px-4 py-3 text-center">Jumlah Menu</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
                 @forelse ($categories as $category)
                     <tr>
                         <td class="px-4 py-3 font-medium">{{ $category->name }}</td>
-                        <td class="px-4 py-3 text-right tabular-nums">{{ $category->products_count }}</td>
+                        <td class="px-4 py-3 text-center tabular-nums">{{ $category->products_count }}</td>
                         <td class="px-4 py-3">
-                            <div class="flex justify-end gap-3">
+                            <div class="flex justify-center gap-3">
                                 <a href="{{ route('owner.categories.edit', $category) }}" class="font-medium text-amber-700 hover:underline">Ubah</a>
                                 @if ($category->products_count === 0)
                                     <form method="POST" action="{{ route('owner.categories.destroy', $category) }}"

@@ -11,7 +11,7 @@
                     <th class="px-4 py-3 text-right">Stok Saat Ini</th>
                     <th class="px-4 py-3 text-right">Stok Minimum</th>
                     <th class="px-4 py-3 text-right">Harga Beli / Satuan</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
@@ -32,7 +32,7 @@
                         </td>
                         <td class="px-4 py-3 text-right tabular-nums text-stone-600">{{ qty($ingredient->min_stock) }} {{ $ingredient->unit->label() }}</td>
                         <td class="px-4 py-3 text-right tabular-nums">{{ rupiah($ingredient->cost_per_unit) }} / {{ $ingredient->unit->label() }}</td>
-                        <td class="px-4 py-3 text-right">
+                        <td class="px-4 py-3 text-center">
                             <a href="{{ route('owner.ingredients.edit', $ingredient) }}" class="font-medium text-amber-700 hover:underline">Ubah</a>
                         </td>
                     </tr>

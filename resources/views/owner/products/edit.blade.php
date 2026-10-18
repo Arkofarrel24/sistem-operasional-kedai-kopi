@@ -1,14 +1,14 @@
 <x-owner-layout title="Ubah Menu">
-    <div class="grid max-w-5xl gap-6 xl:grid-cols-2">
+    <div class="mx-auto grid max-w-5xl gap-6 xl:grid-cols-2">
         <x-card class="p-6">
-            <h2 class="mb-4 text-base font-semibold">Data menu</h2>
+            <h2 class="mb-4 text-center text-base font-semibold">Data menu</h2>
             <form novalidate method="POST" action="{{ route('owner.products.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
                 @include('owner.products._form')
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center gap-3">
                     <x-primary-button>Simpan</x-primary-button>
                     <a href="{{ route('owner.products.index') }}" class="text-sm text-stone-600 hover:underline">Kembali</a>
                 </div>
@@ -16,11 +16,11 @@
         </x-card>
 
         <x-card id="resep" class="p-6">
-            <h2 class="text-base font-semibold">Resep per 1 porsi</h2>
-            <p class="mt-1 text-sm text-stone-600">Jumlah dalam satuan dasar bahan. Stok dikurangi sesuai resep setiap kali menu terjual.</p>
+            <h2 class="text-center text-base font-semibold">Resep per 1 porsi</h2>
+            <p class="mt-1 text-center text-sm text-stone-600">Jumlah dalam satuan dasar bahan. Stok dikurangi sesuai resep setiap kali menu terjual.</p>
 
             @if ($product->recipes->isEmpty())
-                <p class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <p class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
                     Belum ada resep. Menu tanpa resep tidak akan tampil di kasir.
                 </p>
             @else

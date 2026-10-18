@@ -12,7 +12,8 @@
                        class="h-12 w-full rounded-xl border-stone-300 pl-12 text-base focus:border-amber-500 focus:ring-amber-500">
             </div>
 
-            <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6" role="group" aria-label="Kategori">
+            <div class="-mx-4 flex overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6">
+            <div class="mx-auto flex gap-2" role="group" aria-label="Kategori">
                 @foreach ([null => 'Semua'] + $this->categories->pluck('name', 'id')->all() as $id => $name)
                     @php($selected = $categoryId === ($id ?: null))
                     <button type="button" wire:click="selectCategory({{ $id ?: 'null' }})" aria-pressed="{{ $selected ? 'true' : 'false' }}"
@@ -23,23 +24,24 @@
                             ])>{{ $name }}</button>
                 @endforeach
             </div>
+            </div>
         </div>
 
         <div class="flex-1 px-4 pb-6 pt-4 sm:px-6 md:overflow-y-auto">
             @forelse ($this->menu as $categoryName => $products)
                 <div @class(['mt-6' => ! $loop->first])>
-                    <h2 class="mb-2 text-sm font-semibold text-stone-500">{{ $categoryName }}</h2>
+                    <h2 class="mb-2 text-center text-sm font-semibold text-stone-500">{{ $categoryName }}</h2>
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                         @foreach ($products as $product)
                             @php($inCart = $cart[$product->id]['quantity'] ?? 0)
                             <button type="button" wire:key="product-{{ $product->id }}" wire:click="add({{ $product->id }})"
                                     @class([
-                                        'relative flex min-h-[5.5rem] flex-col justify-between rounded-xl bg-white p-3 text-left ring-1 ring-inset transition active:scale-[0.98] active:bg-amber-50',
+                                        'relative flex min-h-[5.5rem] flex-col items-center justify-center rounded-xl bg-white px-8 py-3 text-center ring-1 ring-inset transition active:scale-[0.98] active:bg-amber-50',
                                         'ring-2 ring-amber-500' => $inCart,
                                         'ring-stone-200' => ! $inCart,
                                     ])>
-                                <span class="pr-8 text-base font-semibold leading-snug text-stone-900">{{ $product->name }}</span>
-                                <span class="mt-2 text-[0.95rem] tabular-nums text-stone-600">{{ rupiah($product->price) }}</span>
+                                <span class="text-base font-semibold leading-snug text-stone-900">{{ $product->name }}</span>
+                                <span class="mt-1 text-[0.95rem] tabular-nums text-stone-600">{{ rupiah($product->price) }}</span>
                                 @if ($inCart)
                                     <span class="absolute right-2 top-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-amber-500 px-2 text-sm font-bold tabular-nums text-stone-900"
                                           aria-label="{{ $inCart }} di keranjang">{{ $inCart }}</span>

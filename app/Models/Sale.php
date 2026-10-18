@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
+use App\Enums\StockMovementType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,5 +46,15 @@ class Sale extends Model
     public function isVoid(): bool
     {
         return $this->status === SaleStatus::Void;
+    }
+
+    /**
+     * Who voided the sale, taken from its void_return movements (no separate column in the ERD).
+     */
+    public function voidedBy(): ?User
+    {
+        return $this->isVoid()
+            ? $this->stockMovements()->where('type', StockMovementType::VoidReturn)->with('user')->first()?->user
+            : null;
     }
 }

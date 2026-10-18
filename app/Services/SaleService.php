@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
+use App\Enums\StockMovementType;
 use App\Exceptions\CheckoutException;
 use App\Exceptions\InsufficientStockException;
+use App\Exceptions\SaleException;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -117,6 +119,56 @@ class SaleService
             }
 
             return $sale->load('items');
+        });
+    }
+
+    /**
+     * Cancel a sale: it is kept (status void, reason, voided_at) and every ingredient gets back exactly
+     * what the sale took, as void_return movements at the original unit cost (PLAN.md rule 5).
+     *
+     * The sale row is locked first, so two simultaneous voids queue up and the second one sees the
+     * sale already voided.
+     *
+     * @throws SaleException
+     */
+    public function void(Sale $sale, User $user, string $reason): Sale
+    {
+        $reason = trim($reason);
+
+        if ($reason === '') {
+            throw new SaleException('Alasan void wajib diisi.');
+        }
+
+        return DB::transaction(function () use ($sale, $user, $reason) {
+            $locked = Sale::whereKey($sale->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($locked->isVoid()) {
+                throw new SaleException("Transaksi {$locked->invoice_no} sudah di-void.");
+            }
+
+            // Return what was actually deducted, not what the (possibly changed) recipe says today.
+            $saleMovements = $locked->stockMovements()->where('type', StockMovementType::Sale)->get();
+            $ingredients = $this->stock->lockIngredients($saleMovements->pluck('ingredient_id')->unique()->all());
+
+            foreach ($saleMovements->sortBy('ingredient_id') as $movement) {
+                $this->stock->recordVoidReturn(
+                    $ingredients[$movement->ingredient_id],
+                    bcmul($movement->quantity, '-1', 2),
+                    $locked,
+                    $user,
+                    $movement->unit_cost,
+                );
+            }
+
+            $locked->forceFill([
+                'status' => SaleStatus::Void,
+                'void_reason' => $reason,
+                'voided_at' => now(),
+            ])->save();
+
+            $sale->setRawAttributes($locked->getAttributes(), true);
+
+            return $locked;
         });
     }
 

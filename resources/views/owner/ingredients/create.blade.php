@@ -1,5 +1,5 @@
 <x-owner-layout title="Tambah Bahan">
-    <x-card class="max-w-2xl p-6">
+    <x-card class="mx-auto max-w-2xl p-6">
         <form novalidate method="POST" action="{{ route('owner.ingredients.store') }}" class="space-y-6">
             @csrf
 
@@ -49,7 +49,7 @@
             </label>
             <x-input-error :messages="$errors->get('is_active')" class="mt-2" />
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center gap-3">
                 <x-primary-button>Simpan</x-primary-button>
                 <a href="{{ route('owner.ingredients.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>
             </div>

@@ -5,7 +5,7 @@
 
     @include('owner.partials.menu-tabs')
 
-    <form method="GET" action="{{ route('owner.products.index') }}" class="mb-4 flex flex-wrap items-end gap-3">
+    <form method="GET" action="{{ route('owner.products.index') }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
         <div>
             <x-input-label for="category" value="Kategori" />
             <x-select-input id="category" name="category" class="mt-1 text-sm">
@@ -36,8 +36,8 @@
                     <th class="px-4 py-3">Menu</th>
                     <th class="px-4 py-3">Kategori</th>
                     <th class="px-4 py-3 text-right">Harga</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
+                    <th class="px-4 py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
@@ -63,14 +63,14 @@
                         </td>
                         <td class="px-4 py-3 text-stone-600">{{ $product->category->name }}</td>
                         <td class="px-4 py-3 text-right tabular-nums">{{ rupiah($product->price) }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 text-center">
                             @if ($product->is_active)
                                 <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">Aktif</span>
                             @else
                                 <span class="rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">Nonaktif</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 text-right">
+                        <td class="px-4 py-3 text-center">
                             <a href="{{ route('owner.products.edit', $product) }}" class="font-medium text-amber-700 hover:underline">Ubah</a>
                         </td>
                     </tr>

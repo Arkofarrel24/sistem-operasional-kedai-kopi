@@ -93,6 +93,13 @@ Integrasi pembayaran online, multi-outlet, order online pelanggan, manajemen sup
 6. Menu tanpa resep tidak bisa dijual (tidak muncul di POS) — mencegah stok tidak terlacak.
 7. Menu nonaktif tidak muncul di POS tetapi tetap ada di laporan historis.
 8. Bahan dapat dinonaktifkan (`ingredients.is_active`). Menu yang resepnya memakai minimal satu bahan nonaktif tidak muncul di POS dan ditolak saat checkout, tetapi tetap ada di laporan historis.
+9. Restock memperbarui `ingredients.cost_per_unit` dengan rata-rata tertimbang:
+   `harga baru = (stok lama × harga lama + jumlah masuk × harga beli restock) / (stok lama + jumlah masuk)`,
+   dibulatkan half-up ke 2 desimal. Jika stok lama 0, harga baru = harga beli restock.
+   Contoh: 1.000 g @ Rp250 + restock 500 g @ Rp280 → (250.000 + 140.000) / 1.500 = Rp260/g.
+   Penyesuaian, waste, dan void tidak mengubah `cost_per_unit`.
+10. Setiap movement menyimpan `unit_cost` = harga beli per satuan saat itu (restock: harga beli restock; sale, adjustment, waste: `cost_per_unit` saat dicatat). `void_return` memakai `unit_cost` dari movement `sale` aslinya, sehingga HPP historis tetap akurat.
+11. Void mengembalikan tepat jumlah yang dikurangi saat checkout (dari movement `sale`, bukan dihitung ulang dari resep), dan transaksi yang sudah void tidak bisa di-void lagi.
 
 ---
 

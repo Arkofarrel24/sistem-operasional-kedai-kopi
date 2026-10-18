@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Unit;
 use App\Models\Category;
 use App\Models\Ingredient;
 use App\Models\Product;
@@ -36,6 +37,10 @@ test('owner forms with required fields disable browser validation', function () 
         route('owner.products.edit', $product),
         route('owner.ingredients.create'),
         route('owner.ingredients.edit', $ingredient),
+        route('owner.stock.restock.create', $ingredient),
+        route('owner.stock.adjustment.create', $ingredient),
+        route('owner.stock.waste.create', $ingredient),
+        route('owner.sales.show', checkout(User::factory()->cashier()->create(), [[productWithRecipe('Espresso', 15000, [[stockedIngredient('Kopi', Unit::Gram, 100), 18]]), 1]])),
     ];
 
     foreach ($pages as $page) {

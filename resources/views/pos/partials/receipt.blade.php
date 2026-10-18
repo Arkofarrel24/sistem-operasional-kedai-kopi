@@ -6,7 +6,11 @@
     </div>
 
     @if ($sale->isVoid())
-        <p class="mt-3 border-2 border-stone-900 py-1 text-center font-bold">VOID</p>
+        <div class="mt-3 border-2 border-stone-900 px-2 py-1 text-center">
+            <p class="font-bold">VOID</p>
+            <p>{{ $sale->voided_at->translatedFormat('j M Y H:i') }}</p>
+            <p>Alasan: {{ $sale->void_reason }}</p>
+        </div>
     @endif
 
     <dl class="mt-4 border-t border-dashed border-stone-400 pt-3">
