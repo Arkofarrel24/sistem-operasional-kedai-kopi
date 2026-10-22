@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -42,11 +43,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+
+        // Deactivated users cannot log in (PLAN.md rule 15).
+        if (! Auth::attemptWhen($credentials, fn (User $user) => $user->is_active, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            $user = Auth::guard('web')->getLastAttempted();
+            $correctPassword = $user && Auth::guard('web')->getProvider()->validateCredentials($user, $credentials);
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => $correctPassword ? trans('auth.inactive') : trans('auth.failed'),
             ]);
         }
 

@@ -133,6 +133,9 @@ document.querySelectorAll('[data-revenue-chart]').forEach((wrapper) => {
         wrapper.querySelector('[data-range-total]').textContent = rupiah(total);
         wrapper.querySelector('[data-range-days]').textContent = days;
         wrapper.querySelector('[data-range-average]').textContent = rupiah(total / Math.max(slice.length, 1));
+        wrapper.querySelector('[data-chart-empty]')?.classList.toggle('hidden', total > 0);
+        const emptyDays = wrapper.querySelector('[data-range-days-empty]');
+        if (emptyDays) emptyDays.textContent = days;
 
         const index = buttons.findIndex((b) => Number(b.dataset.range) === days);
         control.dataset.selected = String(index);

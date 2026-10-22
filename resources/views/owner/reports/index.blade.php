@@ -41,11 +41,14 @@
             <dl class="grid divide-y divide-stone-100 md:grid-cols-[1.4fr_1fr_1fr] md:divide-x md:divide-y-0">
                 <x-stat label="Omzet" :value="rupiah($summary['revenue'])" lead :i="0" />
                 <x-stat label="Transaksi" :value="number_format($summary['transactions'], 0, ',', '.')" :i="1" />
-                <x-stat label="Rata-rata per transaksi" :value="rupiah(round((float) $summary['average']))" :i="2" />
+                <x-stat label="Rata-rata per transaksi" :value="rupiah($summary['average'], whole: true)" :i="2" />
             </dl>
 
             <div class="border-t border-stone-100 px-6 py-5">
                 <h3 class="text-sm font-semibold">Per metode pembayaran</h3>
+                @if ($summary['transactions'] === 0)
+                    <p class="mt-3 text-sm text-stone-600">Belum ada transaksi pada periode ini. Coba pilih rentang tanggal lain.</p>
+                @else
                 <div class="grow-x mt-3 flex h-3 gap-0.5 overflow-hidden rounded-full" style="--i: 2" aria-hidden="true">
                     @foreach ($summary['by_method'] as $row)
                         @if ((float) $row['revenue'] > 0)
@@ -70,6 +73,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                @endif
             </div>
         </section>
 
@@ -84,12 +88,14 @@
                 </div>
 
                 {{-- Revenue split into the cost of ingredients sold and what is left as gross profit. --}}
-                <div class="grow-x mt-4 flex h-3 gap-0.5 overflow-hidden rounded-full bg-stone-100" style="--i: 1" aria-hidden="true">
-                    @if ($revenue > 0)
+                @if ($revenue > 0)
+                    <div class="grow-x mt-4 flex h-3 gap-0.5 overflow-hidden rounded-full bg-stone-100" style="--i: 1" aria-hidden="true">
                         <span class="bg-stone-400" style="width: {{ round($cogsShare, 2) }}%"></span>
                         <span class="bg-amber-500" style="width: {{ round(100 - $cogsShare, 2) }}%"></span>
-                    @endif
-                </div>
+                    </div>
+                @else
+                    <p class="mt-4 text-sm text-stone-600">Belum ada penjualan pada periode ini, jadi belum ada laba kotor.</p>
+                @endif
 
                 <dl class="mt-4 space-y-2 text-sm">
                     <div class="flex justify-between gap-4">
@@ -98,11 +104,11 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-stone-600"><span class="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-stone-400 align-middle" aria-hidden="true"></span>HPP (biaya bahan terjual)</dt>
-                        <dd class="tabular-nums">−{{ rupiah($profit['cogs']) }}</dd>
+                        <dd class="tabular-nums">−{{ rupiah($profit['cogs'], whole: true) }}</dd>
                     </div>
                     <div class="flex items-baseline justify-between gap-4 border-t border-stone-200 pt-3">
                         <dt class="font-semibold"><span class="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-amber-500 align-middle" aria-hidden="true"></span>Laba kotor</dt>
-                        <dd class="reveal text-2xl font-bold tabular-nums" style="--i: 3">{{ rupiah($profit['gross_profit']) }}</dd>
+                        <dd class="reveal text-2xl font-bold tabular-nums" style="--i: 3">{{ rupiah($profit['gross_profit'], whole: true) }}</dd>
                     </div>
                 </dl>
                 <p class="mt-4 text-xs text-stone-500">HPP memakai harga beli bahan saat transaksi terjadi, jadi tidak berubah walaupun harga bahan naik setelahnya.</p>
@@ -112,7 +118,7 @@
             <section aria-labelledby="waste-title" class="{{ $card }} p-6">
                 <div class="flex items-baseline justify-between gap-4">
                     <h2 id="waste-title" class="text-base font-semibold">Nilai waste</h2>
-                    <p class="reveal text-2xl font-bold tabular-nums" style="--i: 3">{{ rupiah($waste['total']) }}</p>
+                    <p class="reveal text-2xl font-bold tabular-nums" style="--i: 3">{{ rupiah($waste['total'], whole: true) }}</p>
                 </div>
 
                 @if ($waste['items']->isEmpty())
@@ -123,7 +129,7 @@
                             <li>
                                 <div class="flex justify-between gap-4">
                                     <span>{{ $item->name }} <span class="text-stone-500">{{ qty($item->quantity) }} {{ $item->unit }}</span></span>
-                                    <span class="tabular-nums">{{ rupiah($item->value) }}</span>
+                                    <span class="tabular-nums">{{ rupiah($item->value, whole: true) }}</span>
                                 </div>
                                 <span class="mt-1.5 block h-1.5" aria-hidden="true">
                                     <span class="grow-x block h-full rounded-full bg-red-300" style="width: {{ round((float) $item->value / $maxWaste * 100, 1) }}%; --i: {{ $loop->index }}"></span>
@@ -147,10 +153,14 @@
                     </p>
                 @endif
             </div>
-            <div class="relative mt-5 h-64">
-                <canvas data-hourly-chart='@json($hourly)' data-busiest='@json($busiestHours)'
-                        role="img" aria-label="Grafik jumlah transaksi per jam, {{ $period }}"></canvas>
-            </div>
+            @if ($summary['transactions'] === 0)
+                <p class="mt-4 rounded-xl bg-stone-50 px-4 py-10 text-center text-sm text-stone-600">Belum ada transaksi pada periode ini, jadi jam ramai belum bisa dihitung.</p>
+            @else
+                <div class="relative mt-5 h-64">
+                    <canvas data-hourly-chart='@json($hourly)' data-busiest='@json($busiestHours)'
+                            role="img" aria-label="Grafik jumlah transaksi per jam, {{ $period }}"></canvas>
+                </div>
+            @endif
         </section>
 
         {{-- Best sellers --}}

@@ -45,6 +45,13 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
     public function owner(): static
     {
         return $this->state(fn (array $attributes) => [

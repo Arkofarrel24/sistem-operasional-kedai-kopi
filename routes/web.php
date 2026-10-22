@@ -10,6 +10,9 @@ use App\Http\Controllers\Owner\RestockController;
 use App\Http\Controllers\Owner\SaleController as OwnerSaleController;
 use App\Http\Controllers\Owner\StockAdjustmentController;
 use App\Http\Controllers\Owner\StockController;
+use App\Http\Controllers\Owner\UserController;
+use App\Http\Controllers\Owner\UserPasswordController;
+use App\Http\Controllers\Owner\UserStatusController;
 use App\Http\Controllers\Owner\VoidSaleController;
 use App\Http\Controllers\Owner\WasteController;
 use App\Http\Controllers\Pos\SaleController;
@@ -52,10 +55,15 @@ Route::middleware(['auth', 'role:owner'])
         Route::get('/sales/{sale}', [OwnerSaleController::class, 'show'])->name('sales.show');
         Route::post('/sales/{sale}/void', VoidSaleController::class)->name('sales.void');
 
-        // Placeholders until the related phases are built.
+        // Reports.
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
-        Route::view('/users', 'owner.placeholder', ['title' => 'Pengguna'])->name('users.index');
+
+        // Users: never deleted, only deactivated (PLAN.md rules 15 and 16).
+        Route::resource('users', UserController::class)->except(['show', 'destroy']);
+        Route::patch('/users/{user}/status', [UserStatusController::class, 'update'])->name('users.status');
+        Route::get('/users/{user}/password', [UserPasswordController::class, 'edit'])->name('users.password.edit');
+        Route::put('/users/{user}/password', [UserPasswordController::class, 'update'])->name('users.password.update');
     });
 
 Route::middleware(['auth', 'role:cashier'])

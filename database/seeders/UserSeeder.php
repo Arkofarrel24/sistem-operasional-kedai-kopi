@@ -17,6 +17,8 @@ class UserSeeder extends Seeder
             ['name' => 'Dimas Pratama', 'email' => 'owner@demo.test', 'role' => Role::Owner],
             ['name' => 'Ayu Lestari', 'email' => 'kasir1@demo.test', 'role' => Role::Cashier],
             ['name' => 'Budi Santoso', 'email' => 'kasir2@demo.test', 'role' => Role::Cashier],
+            // Former cashier, kept for history: shows how deactivated users look and that they cannot log in.
+            ['name' => 'Sari Wulandari', 'email' => 'kasir3@demo.test', 'role' => Role::Cashier, 'is_active' => false],
         ];
 
         foreach ($users as $user) {
@@ -25,6 +27,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => $user['name'],
                     'role' => $user['role'],
+                    'is_active' => $user['is_active'] ?? true,
                     'password' => 'password',
                 ],
             );

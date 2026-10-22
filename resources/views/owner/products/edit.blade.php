@@ -44,12 +44,12 @@
                                 <span class="w-10 text-sm text-stone-500">{{ $recipe->ingredient->unit->label() }}</span>
                                 <x-secondary-button type="submit" class="!px-3">Simpan</x-secondary-button>
                             </form>
-                            <form method="POST" action="{{ route('owner.products.recipes.destroy', [$product, $recipe]) }}"
-                                  onsubmit="return confirm(@js('Hapus '.$recipe->ingredient->name.' dari resep?'))">
-                                @csrf
-                                @method('DELETE')
+                            <x-confirm-form :action="route('owner.products.recipes.destroy', [$product, $recipe])" method="DELETE"
+                                            :title="'Hapus '.$recipe->ingredient->name.' dari resep?'"
+                                            message="Transaksi berikutnya tidak lagi mengurangi stok bahan ini untuk menu ini. Anda bisa menambahkannya kembali kapan saja."
+                                            confirm="Hapus dari resep">
                                 <button type="submit" class="text-sm font-medium text-red-600 hover:underline">Hapus</button>
-                            </form>
+                            </x-confirm-form>
                             <x-input-error :messages="$rowErrors->get('quantity')" class="w-full text-right" />
                         </li>
                     @endforeach

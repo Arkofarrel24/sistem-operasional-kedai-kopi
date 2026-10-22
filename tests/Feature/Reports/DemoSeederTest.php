@@ -3,6 +3,7 @@
 use App\Enums\StockMovementType;
 use App\Models\Sale;
 use App\Models\StockMovement;
+use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\DemoTransactionSeeder;
 use Database\Seeders\MasterDataSeeder;
@@ -22,4 +23,20 @@ test('demo seeder records history through the services and keeps stock consisten
         ->and(StockMovement::where('type', StockMovementType::Sale)->distinct('sale_id')->count('sale_id'))->toBe(Sale::count());
 
     $this->artisan('stock:verify')->expectsOutputToContain('Semua stok konsisten')->assertExitCode(0);
+});
+
+test('demo history always ends today and only uses active cashiers', function () {
+    $this->travelTo(Carbon::parse('2026-10-22 15:00', 'Asia/Jakarta'));
+    $now = now();
+
+    $this->travelTo($now->copy()->startOfDay()->subDays(2)->setTime(6, 0));
+    $this->seed([UserSeeder::class, MasterDataSeeder::class]);
+    app(DemoTransactionSeeder::class)->setContainer(app())->__invoke(['until' => $now, 'days' => 2]);
+
+    $inactive = User::where('email', 'kasir3@demo.test')->sole();
+    expect($inactive->is_active)->toBeFalse()
+        ->and(Sale::max('created_at'))->toStartWith('2026-10-22')
+        ->and(Sale::min('created_at'))->toStartWith('2026-10-20')
+        ->and(Sale::where('created_at', '>', $now)->exists())->toBeFalse()
+        ->and(Sale::where('user_id', $inactive->id)->exists())->toBeFalse();
 });

@@ -19,7 +19,7 @@
                     @php($low = $ingredient->isBelowMinimum())
                     <tr>
                         <td class="px-4 py-3 font-medium">
-                            {{ $ingredient->name }}
+                            <a href="{{ route('owner.ingredients.edit', $ingredient) }}" class="hover:text-amber-700 hover:underline">{{ $ingredient->name }}</a>
                             @unless ($ingredient->is_active)
                                 <span class="ml-1 rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">Nonaktif</span>
                             @endunless

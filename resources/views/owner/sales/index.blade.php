@@ -13,7 +13,7 @@
             <x-select-input id="cashier" name="cashier" class="mt-1 text-sm">
                 <option value="">Semua kasir</option>
                 @foreach ($cashiers as $cashier)
-                    <option value="{{ $cashier->id }}" @selected(($filters['cashier'] ?? null) == $cashier->id)>{{ $cashier->name }}</option>
+                    <option value="{{ $cashier->id }}" @selected(($filters['cashier'] ?? null) == $cashier->id)>{{ $cashier->name }}{{ $cashier->is_active ? '' : ' (nonaktif)' }}</option>
                 @endforeach
             </x-select-input>
         </div>
@@ -50,7 +50,7 @@
                 @forelse ($sales as $sale)
                     <tr>
                         <td class="whitespace-nowrap px-4 py-3 tabular-nums text-stone-600">{{ $sale->created_at->translatedFormat('j M Y H:i') }}</td>
-                        <td class="px-4 py-3 font-medium">{{ $sale->invoice_no }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 font-medium"><a href="{{ route('owner.sales.show', $sale) }}" class="hover:text-amber-700 hover:underline">{{ $sale->invoice_no }}</a></td>
                         <td class="px-4 py-3">{{ $sale->user->name }}</td>
                         <td class="px-4 py-3 text-stone-600">{{ $sale->payment_method->label() }}, {{ $sale->items_count }} menu</td>
                         <td @class(['px-4 py-3 text-right tabular-nums', 'text-stone-400 line-through' => $sale->isVoid()])>{{ rupiah($sale->total) }}</td>
@@ -67,7 +67,9 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-10 text-center text-stone-500">Tidak ada transaksi yang cocok dengan filter.</td>
+                        <td colspan="7" class="px-4 py-10 text-center text-stone-500">
+                            {{ array_filter($filters) ? 'Tidak ada transaksi yang cocok dengan filter. Coba ubah atau reset filternya.' : 'Belum ada transaksi. Transaksi yang dicatat kasir akan muncul di sini.' }}
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

@@ -26,16 +26,17 @@
                     <h2 class="text-center text-base font-semibold">Void transaksi</h2>
                     <p class="mt-1 text-center text-sm text-stone-600">Transaksi tetap tersimpan dengan status void, stok bahan dikembalikan, dan tidak dihitung di laporan. Tindakan ini tidak bisa dibatalkan.</p>
 
-                    <form novalidate method="POST" action="{{ route('owner.sales.void', $sale) }}" class="mt-4 space-y-4"
-                          onsubmit="return confirm(@js('Void transaksi '.$sale->invoice_no.'?'))">
-                        @csrf
+                    <x-confirm-form :action="route('owner.sales.void', $sale)" class="mt-4 space-y-4"
+                                    :title="'Void transaksi '.$sale->invoice_no.'?'"
+                                    message="Stok bahan dikembalikan dan transaksi tidak dihitung lagi di laporan. Transaksi tetap tersimpan dengan status void, dan tindakan ini tidak bisa dibatalkan."
+                                    confirm="Void transaksi">
                         <div>
                             <x-input-label for="reason" value="Alasan void" />
                             <x-text-input id="reason" name="reason" type="text" class="mt-1 block w-full" :value="old('reason')" required placeholder="mis. Pelanggan batal, salah input menu" />
                             <x-input-error :messages="$errors->get('reason')" class="mt-2" />
                         </div>
                         <div class="flex justify-center"><x-danger-button>Void transaksi</x-danger-button></div>
-                    </form>
+                    </x-confirm-form>
                 </x-card>
             @endif
 

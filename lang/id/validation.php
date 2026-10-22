@@ -19,6 +19,7 @@ return [
         'numeric' => ':Attribute harus lebih besar dari atau sama dengan :value.',
     ],
     'image' => ':Attribute harus berupa gambar.',
+    'lowercase' => ':Attribute harus memakai huruf kecil.',
     'in' => ':Attribute yang dipilih tidak valid.',
     'integer' => ':Attribute harus berupa bilangan bulat.',
     'max' => [
@@ -34,6 +35,13 @@ return [
         'string' => ':Attribute minimal :min karakter.',
     ],
     'numeric' => ':Attribute harus berupa angka.',
+    'password' => [
+        'letters' => ':Attribute harus memuat minimal satu huruf.',
+        'mixed' => ':Attribute harus memuat huruf besar dan huruf kecil.',
+        'numbers' => ':Attribute harus memuat minimal satu angka.',
+        'symbols' => ':Attribute harus memuat minimal satu simbol.',
+        'uncompromised' => ':Attribute ini pernah bocor di internet. Pilih kata sandi lain.',
+    ],
     'required' => ':Attribute wajib diisi.',
     'string' => ':Attribute harus berupa teks.',
     'unique' => ':Attribute sudah digunakan.',

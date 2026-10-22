@@ -93,7 +93,7 @@ class DemoTransactionSeeder extends Seeder
         $start = $until->startOfDay()->subDays($days);
 
         $owner = User::where('role', Role::Owner)->firstOrFail();
-        [$morning, $afternoon] = User::where('role', Role::Cashier)->orderBy('id')->take(2)->get()->all() + [null, null];
+        [$morning, $afternoon] = User::where('role', Role::Cashier)->active()->orderBy('id')->take(2)->get()->all() + [null, null];
         $afternoon ??= $morning;
         $products = Product::sellable()->get()->keyBy('name');
         $ingredients = Ingredient::all()->keyBy('name');

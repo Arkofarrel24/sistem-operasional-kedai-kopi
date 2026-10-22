@@ -5,6 +5,7 @@ use App\Enums\Unit;
 use App\Exceptions\InsufficientStockException;
 use App\Exceptions\SaleException;
 use App\Exceptions\StockException;
+use App\Exceptions\UserManagementException;
 use App\Models\Ingredient;
 use App\Models\Product;
 use App\Models\Sale;
@@ -140,7 +141,7 @@ function runConcurrently(array $tasks, callable $holdLock): array
                 $outcome = 'ok:'.($result instanceof Sale ? $result->invoice_no : (string) $result);
             } catch (InsufficientStockException) {
                 $outcome = 'insufficient';
-            } catch (SaleException|StockException $exception) {
+            } catch (SaleException|StockException|UserManagementException $exception) {
                 $outcome = 'rejected:'.$exception->getMessage();
             } catch (Throwable $exception) {
                 $outcome = 'error:'.$exception->getMessage();

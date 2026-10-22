@@ -7,12 +7,13 @@ use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -26,6 +27,7 @@ class User extends Authenticatable
      */
     protected $attributes = [
         'role' => 'cashier',
+        'is_active' => true,
     ];
 
     /**
@@ -39,6 +41,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'is_active' => 'boolean',
         ];
     }
 
@@ -55,6 +58,11 @@ class User extends Authenticatable
     public function hasRole(Role ...$roles): bool
     {
         return in_array($this->role, $roles, true);
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
     }
 
     public function isOwner(): bool

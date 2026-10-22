@@ -103,6 +103,8 @@ Integrasi pembayaran online, multi-outlet, order online pelanggan, manajemen sup
 12. Transaksi void tidak dihitung di omzet, jumlah transaksi, rata-rata, rincian metode bayar, menu terlaris, penjualan per jam, maupun HPP.
 13. Semua pengelompokan tanggal dan jam memakai zona waktu Asia/Jakarta: timestamp disimpan dalam waktu Jakarta dan sesi database dikunci ke `+07:00`. Rentang tanggal laporan inklusif: tanggal akhir dihitung sampai 23:59:59.
 14. Angka laporan diagregasi di query database (SUM/COUNT/GROUP BY), bukan dengan memuat semua baris ke PHP. HPP = Σ (jumlah × `unit_cost`) dari movement `sale` milik transaksi selesai pada periode itu (bukan `cost_per_unit` saat ini); laba kotor = omzet − HPP; margin = laba kotor ÷ omzet. Nilai waste = Σ (jumlah × `unit_cost`) movement `waste` pada periode itu.
+15. Pengguna tidak pernah dihapus karena transaksi dan movement merujuk ke mereka; pengguna dinonaktifkan (`users.is_active`). Pengguna nonaktif tidak bisa login, dan sesi yang sedang aktif dikeluarkan pada request berikutnya.
+16. Owner tidak bisa menonaktifkan atau menurunkan peran akunnya sendiri, dan sistem selalu menyisakan minimal satu owner aktif (baris owner aktif dikunci saat pengecekan agar dua perubahan bersamaan tidak bisa menghabiskan semua owner). Owner mengatur kata sandi baru saat reset; perangkat dengan "Ingat saya" diminta masuk ulang.
 
 ---
 
@@ -220,7 +222,8 @@ Struktur yang disarankan: logika stok dan transaksi di service class (`app/Servi
 
 ## 7. Data Dummy (Seeder)
 
-- 1 owner (`owner@demo.test`) dan 2 kasir (`kasir1@demo.test`, `kasir2@demo.test`), password `password`.
+- 1 owner (`owner@demo.test`) dan 2 kasir (`kasir1@demo.test`, `kasir2@demo.test`), password `password`; ditambah 1 kasir nonaktif (`kasir3@demo.test`) untuk demo manajemen pengguna.
+- Data transaksi 30 hari selalu berakhir di tanggal saat seeder dijalankan (hari ini, sampai jam saat itu).
 - 4 kategori, ±15 menu dengan harga realistis (Rp15.000–Rp95.000 untuk botolan 1 L).
 - ±12 bahan dengan resep lengkap untuk semua menu.
 - ±30 hari transaksi dummy dengan pola realistis: ramai jam 07–09 dan 15–17, akhir pekan lebih ramai, 2–3 bahan sengaja di bawah stok minimum.

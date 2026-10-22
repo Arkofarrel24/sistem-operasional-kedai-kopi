@@ -65,6 +65,14 @@
                 </div>
             @endforelse
         </div>
+
+        {{-- Phones: the cart sits below the menu, so keep the running total in view and jump to it. --}}
+        @if ($cart)
+            <a href="#pesanan" class="sticky bottom-0 z-10 flex items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
+                <span class="text-sm text-stone-600">{{ $this->itemCount }} item, <span class="text-base font-bold tabular-nums text-stone-900">{{ rupiah($this->total) }}</span></span>
+                <span class="flex h-11 items-center rounded-xl bg-amber-500 px-4 text-base font-semibold text-stone-950">Lihat pesanan</span>
+            </a>
+        @endif
     </section>
 
     {{-- Cart & payment --}}

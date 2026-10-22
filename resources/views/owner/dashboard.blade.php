@@ -21,8 +21,8 @@
                 <x-stat label="Transaksi" :value="number_format($today['transactions'], 0, ',', '.')" :i="1">
                     <x-change-indicator :change="$changes['transactions']" :previous="number_format($lastWeek['transactions'], 0, ',', '.')" />
                 </x-stat>
-                <x-stat label="Rata-rata per transaksi" :value="rupiah(round((float) $today['average']))" :i="2">
-                    <x-change-indicator :change="$changes['average']" :previous="rupiah(round((float) $lastWeek['average']))" />
+                <x-stat label="Rata-rata per transaksi" :value="rupiah($today['average'], whole: true)" :i="2">
+                    <x-change-indicator :change="$changes['average']" :previous="rupiah($lastWeek['average'], whole: true)" />
                 </x-stat>
             </dl>
         </section>
@@ -35,9 +35,9 @@
                     <div>
                         <h2 id="chart-title" class="text-base font-semibold">Omzet harian</h2>
                         <p class="mt-1 text-sm text-stone-600" aria-live="polite">
-                            <span data-range-total class="font-semibold tabular-nums text-stone-900">{{ rupiah(round($sevenTotal)) }}</span>
+                            <span data-range-total class="font-semibold tabular-nums text-stone-900">{{ rupiah($sevenTotal, whole: true) }}</span>
                             dalam <span data-range-days>7</span> hari, rata-rata
-                            <span data-range-average class="tabular-nums">{{ rupiah(round($sevenTotal / max(count($lastSeven), 1))) }}</span> per hari
+                            <span data-range-average class="tabular-nums">{{ rupiah($sevenTotal / max(count($lastSeven), 1), whole: true) }}</span> per hari
                         </p>
                     </div>
 
@@ -56,6 +56,12 @@
 
                 <div class="relative mt-5 h-64">
                     <canvas role="img" aria-label="Grafik omzet harian"></canvas>
+                    {{-- Shown when the selected range has no sales (toggled by charts.js). --}}
+                    <div data-chart-empty @class(['absolute inset-0 flex items-center justify-center bg-white/85 px-6 text-center', 'hidden' => $sevenTotal > 0])>
+                        <p class="max-w-xs text-sm text-stone-600">
+                            Belum ada penjualan dalam <span data-range-days-empty>7</span> hari terakhir. Grafik terisi setelah kasir mencatat transaksi.
+                        </p>
+                    </div>
                 </div>
             </section>
 

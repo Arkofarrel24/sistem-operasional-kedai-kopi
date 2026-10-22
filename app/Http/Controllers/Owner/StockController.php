@@ -14,11 +14,10 @@ class StockController extends Controller
 {
     public function index(): View
     {
-        $ingredients = Ingredient::orderBy('name')->get();
-
         return view('owner.stock.index', [
-            'ingredients' => $ingredients,
-            'totalValue' => $ingredients->reduce(fn (string $sum, Ingredient $ingredient) => bcadd($sum, $ingredient->stockValue(), 2), '0'),
+            'ingredients' => Ingredient::orderBy('name')->paginate(25),
+            // Over all ingredients, not just this page.
+            'totalValue' => (string) (Ingredient::query()->selectRaw('COALESCE(SUM(current_stock * cost_per_unit), 0) as total')->value('total') ?? '0'),
         ]);
     }
 

@@ -12,23 +12,27 @@
             @else
                 <ul class="mt-6 divide-y divide-stone-100 overflow-hidden rounded-2xl bg-white ring-1 ring-inset ring-stone-200">
                     @foreach ($sales as $sale)
-                        <li class="flex items-center gap-4 px-4 py-3">
-                            <div class="w-14 shrink-0 text-base font-semibold tabular-nums">{{ $sale->created_at->format('H:i') }}</div>
+                        <li class="flex items-center gap-3 px-4 py-3 sm:gap-4">
+                            <div class="w-12 shrink-0 text-base font-semibold tabular-nums sm:w-14">{{ $sale->created_at->format('H:i') }}</div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-base font-medium">
+                                <p class="text-sm font-medium tabular-nums sm:text-base">
                                     {{ $sale->invoice_no }}
                                     @if ($sale->isVoid())
                                         <span class="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Void</span>
                                     @endif
                                 </p>
-                                <p class="text-sm text-stone-500">{{ $sale->items_count }} menu, {{ $sale->payment_method->label() }}</p>
+                                <p class="text-sm text-stone-500">
+                                    {{ $sale->items_count }} menu, {{ $sale->payment_method->label() }}<span class="sm:hidden">, </span><span @class(['font-semibold tabular-nums text-stone-900 sm:hidden', '!text-stone-400 line-through' => $sale->isVoid()])>{{ rupiah($sale->total) }}</span>
+                                </p>
                             </div>
-                            <p @class(['shrink-0 text-base font-semibold tabular-nums', 'text-stone-400 line-through' => $sale->isVoid()])>{{ rupiah($sale->total) }}</p>
+                            <p @class(['hidden shrink-0 text-base font-semibold tabular-nums sm:block', 'text-stone-400 line-through' => $sale->isVoid()])>{{ rupiah($sale->total) }}</p>
                             <a href="{{ route('pos.sales.show', $sale) }}"
                                class="flex h-11 shrink-0 items-center rounded-xl px-4 text-base font-medium text-stone-800 ring-1 ring-inset ring-stone-300 active:bg-stone-100">Struk</a>
                         </li>
                     @endforeach
                 </ul>
+
+                <div class="mt-4">{{ $sales->links() }}</div>
             @endif
         </div>
     </div>

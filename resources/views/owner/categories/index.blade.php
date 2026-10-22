@@ -17,18 +17,18 @@
             <tbody class="divide-y divide-stone-100">
                 @forelse ($categories as $category)
                     <tr>
-                        <td class="px-4 py-3 font-medium">{{ $category->name }}</td>
+                        <td class="px-4 py-3 font-medium"><a href="{{ route('owner.categories.edit', $category) }}" class="hover:text-amber-700 hover:underline">{{ $category->name }}</a></td>
                         <td class="px-4 py-3 text-center tabular-nums">{{ $category->products_count }}</td>
                         <td class="px-4 py-3">
                             <div class="flex justify-center gap-3">
                                 <a href="{{ route('owner.categories.edit', $category) }}" class="font-medium text-amber-700 hover:underline">Ubah</a>
                                 @if ($category->products_count === 0)
-                                    <form method="POST" action="{{ route('owner.categories.destroy', $category) }}"
-                                          onsubmit="return confirm(@js('Hapus kategori '.$category->name.'?'))">
-                                        @csrf
-                                        @method('DELETE')
+                                    <x-confirm-form :action="route('owner.categories.destroy', $category)" method="DELETE"
+                                                    :title="'Hapus kategori '.$category->name.'?'"
+                                                    message="Kategori ini belum dipakai menu mana pun, jadi bisa dihapus. Tindakan ini tidak bisa dibatalkan."
+                                                    confirm="Hapus kategori">
                                         <button type="submit" class="font-medium text-red-600 hover:underline">Hapus</button>
-                                    </form>
+                                    </x-confirm-form>
                                 @else
                                     <span class="text-stone-400" title="Kategori masih dipakai oleh menu">Hapus</span>
                                 @endif
@@ -43,4 +43,6 @@
             </tbody>
         </table>
     </x-card>
+
+    <div class="mt-4">{{ $categories->links() }}</div>
 </x-owner-layout>

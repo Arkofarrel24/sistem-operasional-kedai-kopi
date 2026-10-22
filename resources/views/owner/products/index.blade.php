@@ -51,7 +51,7 @@
                                     <div class="h-10 w-10 rounded-lg bg-stone-100"></div>
                                 @endif
                                 <div>
-                                    <p class="font-medium">{{ $product->name }}</p>
+                                    <p class="font-medium"><a href="{{ route('owner.products.edit', $product) }}" class="hover:text-amber-700 hover:underline">{{ $product->name }}</a></p>
                                     @if ($product->recipes_count === 0)
                                         <span class="mt-0.5 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">Belum ada resep</span>
                                     @endif

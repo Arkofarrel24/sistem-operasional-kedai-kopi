@@ -3,10 +3,11 @@
 if (! function_exists('rupiah')) {
     /**
      * Format an amount as Rupiah, e.g. Rp15.000 (cents shown only when present: Rp22,50).
+     * With $whole the amount is rounded to whole rupiah for display (stored values stay exact).
      */
-    function rupiah(string|int|float|null $amount): string
+    function rupiah(string|int|float|null $amount, bool $whole = false): string
     {
-        $amount = (float) $amount;
+        $amount = $whole ? round((float) $amount) : (float) $amount;
         $decimals = fmod($amount, 1.0) == 0.0 ? 0 : 2;
 
         return 'Rp'.number_format($amount, $decimals, ',', '.');

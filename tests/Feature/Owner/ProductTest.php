@@ -125,3 +125,19 @@ test('products using an inactive ingredient are flagged in the list', function (
     $response->assertSeeInOrder(['Caramel Latte', 'Bahan nonaktif', 'Espresso']);
     expect(substr_count($response->getContent(), 'Bahan nonaktif'))->toBe(1);
 });
+
+test('product photos must be small images', function (callable $file, string $message) {
+    Storage::fake('public');
+
+    $this->actingAs($this->owner)
+        ->post(route('owner.products.store'), [
+            'name' => 'Latte', 'category_id' => $this->category->id, 'price' => '25000', 'image' => $file(),
+        ])
+        ->assertSessionHasErrors(['image' => $message]);
+
+    expect(Product::count())->toBe(0);
+})->with([
+    'not an image' => [fn () => UploadedFile::fake()->create('menu.pdf', 100, 'application/pdf'), 'Foto harus berupa gambar.'],
+    'svg (can carry scripts)' => [fn () => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml'), 'Foto harus berupa gambar.'],
+    'larger than 2 MB' => [fn () => UploadedFile::fake()->image('besar.jpg')->size(2049), 'Foto maksimal 2048 kilobita.'],
+]);

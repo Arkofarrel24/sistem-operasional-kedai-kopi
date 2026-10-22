@@ -18,7 +18,7 @@ class SaleHistoryController extends Controller
             ->withCount('items')
             ->latest()
             ->latest('id')
-            ->get();
+            ->paginate(20);
 
         return view('pos.history', compact('sales'));
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
         ]);
+
+        // Deactivated users are signed out on their next request (PLAN.md rule 15).
+        $middleware->web(append: [EnsureUserIsActive::class]);
 
         // Check the role before route model binding, so a wrong role always gets 403
         // (not a 404 that reveals which ids exist).
