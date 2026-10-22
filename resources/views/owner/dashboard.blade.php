@@ -1,4 +1,4 @@
-<x-owner-layout title="Dashboard">
+<x-owner-layout title="Beranda">
     @php
         $comparedAt = $now->subWeek()->translatedFormat('l, j M').' sampai pukul '.$now->format('H.i');
         $maxTop = $topProducts->max(fn ($product) => (float) $product->revenue) ?: 1;
@@ -6,7 +6,7 @@
         $sevenTotal = array_sum(array_column($lastSeven, 'revenue'));
     @endphp
 
-    <div class="mx-auto max-w-6xl space-y-6">
+    <div class="max-w-6xl space-y-6">
         {{-- Today --}}
         <section aria-labelledby="today-title" class="rounded-2xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
             <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-stone-100 px-6 py-4">
@@ -55,7 +55,8 @@
                 </div>
 
                 <div class="relative mt-5 h-64">
-                    <canvas role="img" aria-label="Grafik omzet harian"></canvas>
+                    <x-chart-skeleton />
+                    <canvas role="img" aria-label="Grafik omzet harian. Angkanya ada di tabel setelah grafik."></canvas>
                     {{-- Shown when the selected range has no sales (toggled by charts.js). --}}
                     <div data-chart-empty @class(['absolute inset-0 flex items-center justify-center bg-white/85 px-6 text-center', 'hidden' => $sevenTotal > 0])>
                         <p class="max-w-xs text-sm text-stone-600">
@@ -63,6 +64,17 @@
                         </p>
                     </div>
                 </div>
+
+                {{-- The same numbers for screen readers (the canvas itself is only an image). --}}
+                <table class="sr-only">
+                    <caption>Omzet harian {{ count($chart) }} hari terakhir</caption>
+                    <thead><tr><th scope="col">Tanggal</th><th scope="col">Omzet</th><th scope="col">Transaksi</th></tr></thead>
+                    <tbody>
+                        @foreach ($chart as $day)
+                            <tr><td>{{ $day['label'] }}</td><td>{{ rupiah($day['revenue'], whole: true) }}</td><td>{{ $day['transactions'] }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </section>
 
             {{-- Low stock --}}

@@ -25,3 +25,8 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Documentation tooling (scripts/demo-video) keeps its own dependencies and scratch output
+/scripts/demo-video/node_modules
+/scripts/demo-video/.output
+.impeccable/

@@ -45,5 +45,5 @@ test('the excel export works on an empty period', function () {
     $book = IOFactory::load($response->getFile()->getPathname());
     expect($book->getSheetByName('Rekap')->getCell('C8')->getCalculatedValue())->toEqual(0)
         ->and($book->getSheetByName('Laba Kotor')->getCell('B8')->getCalculatedValue())->toEqual(0)
-        ->and($book->getSheetByName('Laba Kotor')->getCell('A12')->getValue())->toBe('Tidak ada waste pada periode ini');
+        ->and($book->getSheetByName('Laba Kotor')->getCell('A12')->getValue())->toBe('Tidak ada bahan terbuang pada periode ini');
 });

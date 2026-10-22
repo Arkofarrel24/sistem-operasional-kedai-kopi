@@ -74,6 +74,9 @@ const reveal = (canvas, duration) => {
 };
 
 // Daily revenue line with a 7 / 30 day segmented control.
+// The grey placeholder bars only hold the space until the real chart is drawn.
+const clearSkeleton = (canvas) => canvas.parentElement.querySelector('[data-chart-skeleton]')?.remove();
+
 document.querySelectorAll('[data-revenue-chart]').forEach((wrapper) => {
     const points = JSON.parse(wrapper.dataset.revenueChart);
     const canvas = wrapper.querySelector('canvas');
@@ -112,6 +115,7 @@ document.querySelectorAll('[data-revenue-chart]').forEach((wrapper) => {
         },
         options,
     });
+    clearSkeleton(canvas);
 
     let current = null;
 
@@ -188,6 +192,7 @@ const drawHourly = (canvas) => {
               delay: (context) => (context.type === 'data' && context.mode === 'default' ? context.dataIndex * 22 : 0),
           };
 
+    clearSkeleton(canvas);
     new Chart(canvas, {
         type: 'bar',
         data: {

@@ -46,9 +46,9 @@ class GrossProfitSheet extends ReportSheet
             ['HPP (harga beli bahan terjual)', (float) $this->profit['cogs']],
             ['Laba kotor', '=B5-B6'],
             ['Margin laba kotor', '=IFERROR(B7/B5,0)'],
-            ['Nilai waste', $this->waste['items']->isEmpty() ? 0 : "=SUM(D{$wasteFirst}:D{$wasteLast})"],
+            ['Nilai bahan terbuang', $this->waste['items']->isEmpty() ? 0 : "=SUM(D{$wasteFirst}:D{$wasteLast})"],
             [null],
-            ['Bahan terbuang (waste)', 'Jumlah', 'Satuan', 'Nilai'],
+            ['Bahan terbuang', 'Jumlah', 'Satuan', 'Nilai'],
         ];
 
         foreach ($this->waste['items'] as $item) {
@@ -56,7 +56,7 @@ class GrossProfitSheet extends ReportSheet
         }
 
         if ($this->waste['items']->isEmpty()) {
-            $rows[] = ['Tidak ada waste pada periode ini', null, null, 0];
+            $rows[] = ['Tidak ada bahan terbuang pada periode ini', null, null, 0];
         }
 
         return $rows;
@@ -76,7 +76,7 @@ class GrossProfitSheet extends ReportSheet
     {
         return [
             'HPP = jumlah bahan terjual x harga beli bahan saat transaksi terjadi (tidak berubah walau harga bahan naik kemudian).',
-            'Transaksi void tidak dihitung. Nilai waste = jumlah terbuang x harga beli saat waste dicatat.',
+            'Transaksi void tidak dihitung. Nilai bahan terbuang = jumlah x harga beli saat dicatat.',
         ];
     }
 

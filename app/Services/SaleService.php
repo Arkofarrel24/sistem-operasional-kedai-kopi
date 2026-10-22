@@ -9,6 +9,7 @@ use App\Exceptions\CheckoutException;
 use App\Exceptions\InsufficientStockException;
 use App\Exceptions\SaleException;
 use App\Models\Product;
+use App\Models\Recipe;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -120,6 +121,47 @@ class SaleService
 
             return $sale->load('items');
         });
+    }
+
+    /**
+     * How many more portions of each product the current stock covers once the cart's own usage is
+     * set aside. Negative means the cart already needs more than is on hand: a line of that product
+     * fits at most (its quantity + the result) portions.
+     *
+     * A plain read without locks, for the register's hints only; checkout() re-checks under lock.
+     *
+     * @param  Collection<int, Product>  $products  with recipes.ingredient loaded
+     * @param  array<int, int>  $cart  product id => quantity
+     * @return array<int, int> product id => portions
+     */
+    public function availablePortions(Collection $products, array $cart): array
+    {
+        $reserved = [];
+        $cartRecipes = Recipe::whereIn('product_id', array_keys($cart))->get(['product_id', 'ingredient_id', 'quantity']);
+        foreach ($cartRecipes as $recipe) {
+            $reserved[$recipe->ingredient_id] = bcadd(
+                $reserved[$recipe->ingredient_id] ?? '0',
+                bcmul($recipe->quantity, (string) $cart[$recipe->product_id], 2),
+                2,
+            );
+        }
+
+        $portions = [];
+        foreach ($products as $product) {
+            $limit = null;
+            foreach ($product->recipes as $recipe) {
+                if (bccomp($recipe->quantity, '0', 2) <= 0) {
+                    continue;
+                }
+
+                $left = bcsub($recipe->ingredient->current_stock, $reserved[$recipe->ingredient_id] ?? '0', 2);
+                $fits = $this->floorDiv($left, $recipe->quantity);
+                $limit = $limit === null ? $fits : min($limit, $fits);
+            }
+            $portions[$product->id] = $limit ?? self::MAX_QUANTITY;
+        }
+
+        return $portions;
     }
 
     /**
@@ -251,6 +293,20 @@ class SaleService
         if ($shortages !== []) {
             throw new InsufficientStockException($shortages);
         }
+    }
+
+    /**
+     * floor($dividend / $divisor) for 2-decimal strings; bcdiv() truncates toward zero instead.
+     */
+    private function floorDiv(string $dividend, string $divisor): int
+    {
+        $quotient = (int) bcdiv($dividend, $divisor, 0);
+
+        if (bccomp(bcmul((string) $quotient, $divisor, 2), $dividend, 2) > 0) {
+            $quotient--;
+        }
+
+        return $quotient;
     }
 
     /**

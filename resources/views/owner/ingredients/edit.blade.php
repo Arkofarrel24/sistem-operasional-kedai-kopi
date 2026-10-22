@@ -1,5 +1,5 @@
 <x-owner-layout title="Ubah Bahan">
-    <x-card class="mx-auto max-w-2xl p-6">
+    <x-card class="max-w-2xl p-6">
         <form novalidate method="POST" action="{{ route('owner.ingredients.update', $ingredient) }}" class="space-y-6">
             @csrf
             @method('PUT')
@@ -10,7 +10,7 @@
                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
             </div>
 
-            <dl class="grid gap-4 rounded-lg bg-stone-50 p-4 text-center text-sm sm:grid-cols-2">
+            <dl class="grid gap-4 rounded-lg bg-stone-50 p-4 text-sm sm:grid-cols-2">
                 <div>
                     <dt class="text-stone-500">Satuan dasar</dt>
                     <dd class="font-medium">{{ $ingredient->unit->label() }}</dd>
@@ -38,13 +38,13 @@
             </div>
 
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                <input type="checkbox" name="is_active" value="1" class="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
                        @checked(old('is_active', $ingredient->is_active))>
                 <span class="text-sm">Aktif (bahan nonaktif membuat menu yang memakainya tidak tampil di kasir)</span>
             </label>
             <x-input-error :messages="$errors->get('is_active')" class="mt-2" />
 
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center gap-3">
                 <x-primary-button>Simpan</x-primary-button>
                 <a href="{{ route('owner.ingredients.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>
             </div>

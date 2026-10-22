@@ -4,7 +4,10 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "docs:install": "npm --prefix scripts/demo-video install && npm --prefix scripts/demo-video exec -- playwright install ffmpeg",
+        "docs:screenshots": "npm --prefix scripts/demo-video run screenshots",
+        "docs:video": "npm --prefix scripts/demo-video run video"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

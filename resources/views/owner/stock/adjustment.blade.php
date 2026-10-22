@@ -1,5 +1,5 @@
 <x-owner-layout title="Penyesuaian Stok">
-    <x-card class="mx-auto max-w-2xl p-6">
+    <x-card class="max-w-2xl p-6">
         @include('owner.stock._summary')
 
         <form novalidate method="POST" action="{{ route('owner.stock.adjustment.store', $ingredient) }}" class="mt-6 space-y-6">
@@ -18,7 +18,7 @@
                 <x-input-error :messages="$errors->get('reason')" class="mt-2" />
             </div>
 
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center gap-3">
                 <x-primary-button>Simpan penyesuaian</x-primary-button>
                 <a href="{{ route('owner.stock.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>
             </div>

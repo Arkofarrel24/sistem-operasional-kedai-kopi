@@ -25,6 +25,6 @@ class WasteController extends Controller
             return back()->withInput()->withErrors(['quantity' => $exception->getMessage()]);
         }
 
-        return to_route('owner.stock.index')->with('status', "Waste {$ingredient->name} ".qty($request->validated('quantity'))." {$ingredient->unit->label()} dicatat.");
+        return to_route('owner.stock.index')->with('status', "Bahan terbuang: {$ingredient->name} ".qty($request->validated('quantity'))." {$ingredient->unit->label()} dicatat.");
     }
 }

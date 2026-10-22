@@ -23,8 +23,10 @@ test('owner can list products with rupiah prices and a missing-recipe badge', fu
     $response->assertOk()
         ->assertSee('Rp22.000')
         ->assertSee('Rp15.000')
+        ->assertSee('1 menu aktif belum punya resep')
         ->assertSeeInOrder(['Es Kopi Susu', 'Kopi Tubruk', 'Belum ada resep']);
-    expect(substr_count($response->getContent(), 'Belum ada resep'))->toBe(1);
+    // One badge per layout (phone cards and table), for the one product without a recipe.
+    expect(substr_count($response->getContent(), '>Belum ada resep</span>'))->toBe(2);
 });
 
 test('products can be filtered by category and status', function () {
@@ -123,7 +125,8 @@ test('products using an inactive ingredient are flagged in the list', function (
     $response = $this->actingAs($this->owner)->get(route('owner.products.index'))->assertOk();
 
     $response->assertSeeInOrder(['Caramel Latte', 'Bahan nonaktif', 'Espresso']);
-    expect(substr_count($response->getContent(), 'Bahan nonaktif'))->toBe(1);
+    // One badge per layout (phone cards and table), only for Caramel Latte.
+    expect(substr_count($response->getContent(), 'Bahan nonaktif'))->toBe(2);
 });
 
 test('product photos must be small images', function (callable $file, string $message) {

@@ -55,6 +55,28 @@ class StockService
     }
 
     /**
+     * Restock from the supplier's bill: the owner enters the total paid, the unit cost is derived.
+     */
+    public function restockFromTotal(Ingredient $ingredient, string $quantity, string $totalCost, User $user, ?string $note = null): StockMovement
+    {
+        $this->ensurePositive($quantity, 'Jumlah restock harus lebih besar dari 0.');
+
+        if (bccomp($totalCost, '0', 2) < 0) {
+            throw new StockException('Total harga nota tidak boleh negatif.');
+        }
+
+        return $this->restock($ingredient, $quantity, $this->unitCostFromTotal($totalCost, $quantity), $user, $note);
+    }
+
+    /**
+     * Total paid ÷ quantity, rounded half-up to 2 decimals (both are never negative).
+     */
+    public function unitCostFromTotal(string $totalCost, string $quantity): string
+    {
+        return bcadd(bcadd(bcdiv($totalCost, $quantity, 6), '0.005', 6), '0', 2);
+    }
+
+    /**
      * Stock opname: book the difference between the physical count and the system stock.
      * Returns null when the count already matches (nothing to record).
      */
@@ -82,14 +104,14 @@ class StockService
      */
     public function recordWaste(Ingredient $ingredient, string $quantity, User $user, string $reason): StockMovement
     {
-        $this->ensurePositive($quantity, 'Jumlah waste harus lebih besar dari 0.');
+        $this->ensurePositive($quantity, 'Jumlah terbuang harus lebih besar dari 0.');
         $reason = $this->requireReason($reason);
 
         return $this->change($ingredient, function (Ingredient $locked) use ($quantity, $user, $reason) {
             if (bccomp($quantity, $locked->current_stock, 2) > 0) {
                 $unit = $locked->unit->label();
 
-                throw new StockException('Jumlah waste ('.qty($quantity)." {$unit}) melebihi stok saat ini (".qty($locked->current_stock)." {$unit}).");
+                throw new StockException('Jumlah terbuang ('.qty($quantity)." {$unit}) melebihi stok saat ini (".qty($locked->current_stock)." {$unit}).");
             }
 
             return $this->apply($locked, StockMovementType::Waste, bcmul($quantity, '-1', 2), $user, $locked->cost_per_unit, $reason);

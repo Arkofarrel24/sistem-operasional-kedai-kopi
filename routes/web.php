@@ -37,7 +37,8 @@ Route::middleware(['auth', 'role:owner'])
         // Master data. Products and ingredients are deactivated/kept rather than deleted (history refers to them).
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('products', ProductController::class)->except(['show', 'destroy']);
-        Route::resource('products.recipes', RecipeController::class)->only(['store', 'update', 'destroy'])->scoped();
+        Route::resource('products.recipes', RecipeController::class)->only(['store', 'destroy'])->scoped();
+        Route::put('/products/{product}/recipes', [RecipeController::class, 'updateAll'])->name('products.recipes.update-all');
         Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
 
         // Stock: every change goes through StockService (PLAN.md rule 5).

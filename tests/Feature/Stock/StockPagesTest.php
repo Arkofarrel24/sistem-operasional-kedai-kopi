@@ -21,10 +21,10 @@ test('stock overview shows status and stock value per ingredient', function () {
         ->get(route('owner.stock.index'))
         ->assertOk()
         ->assertSee('Rp1.362.500') // total stock value
-        ->assertSeeInOrder(['Biji Kopi', '5.000 gram', '1.000 gram', 'Aman', 'Rp1.250.000'])
-        ->assertSeeInOrder(['Bubuk Matcha', '250 gram', '300 gram', 'Menipis', 'Rp112.500'])
-        ->assertSeeInOrder(['Botol 1 L', '0 pcs', '10 pcs', 'Habis', 'Rp0'])
-        ->assertSee(['Restock', 'Penyesuaian', 'Waste', 'Riwayat']);
+        ->assertSeeInOrder(['Biji Kopi', 'Aman', '5.000 gram', '1.000 gram', 'Rp1.250.000'])
+        ->assertSeeInOrder(['Bubuk Matcha', 'Menipis', '250 gram', '300 gram', 'Rp112.500'])
+        ->assertSeeInOrder(['Botol 1 L', 'Habis', '0 pcs', '10 pcs', 'Rp0'])
+        ->assertSee(['Restock', 'Penyesuaian (stock opname)', 'Catat bahan terbuang', 'Riwayat pergerakan']);
 });
 
 test('movement history shows who recorded it and the invoice of sale movements', function () {
@@ -36,7 +36,7 @@ test('movement history shows who recorded it and the invoice of sale movements',
     $this->actingAs($this->owner)
         ->get(route('owner.stock.show', $coffee))
         ->assertOk()
-        ->assertSeeInOrder(['Waste', '−10 gram', 'Rp250', 'Dimas Pratama', 'Tumpah'])
+        ->assertSeeInOrder(['Terbuang', '−10 gram', 'Rp250', 'Dimas Pratama', 'Tumpah'])
         ->assertSeeInOrder(['Penjualan', '−36 gram', 'Rp250', 'Ayu Lestari', $sale->invoice_no])
         ->assertSeeInOrder(['Penyesuaian', '+1.000 gram', 'Stok awal']);
 });

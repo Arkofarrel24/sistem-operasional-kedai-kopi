@@ -64,6 +64,7 @@ return [
         'quantity' => 'jumlah',
         'reason' => 'alasan',
         'to' => 'sampai tanggal',
+        'total_cost' => 'total harga nota',
         'unit_cost' => 'harga beli per satuan',
         'note' => 'catatan',
         'unit' => 'satuan',

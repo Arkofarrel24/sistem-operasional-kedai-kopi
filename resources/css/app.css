@@ -6,6 +6,26 @@
     display: none !important;
 }
 
+/*
+ * Browser surfaces in the palette: one amber focus outline for every pressable control (components
+ * with their own focus ring override it), amber text selection, and amber native checkboxes/radios.
+ */
+@layer base {
+    :root {
+        accent-color: theme('colors.amber.600');
+    }
+
+    :where(a, button, summary, [role='button'], [tabindex]):focus-visible {
+        outline: 2px solid theme('colors.amber.600');
+        outline-offset: 2px;
+    }
+
+    ::selection {
+        background-color: theme('colors.amber.200');
+        color: theme('colors.stone.900');
+    }
+}
+
 /* The POS body disables text selection for touch; fields must stay typeable (iOS Safari). */
 input,
 textarea {

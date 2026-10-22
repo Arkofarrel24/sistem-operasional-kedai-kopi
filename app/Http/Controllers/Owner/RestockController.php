@@ -20,7 +20,7 @@ class RestockController extends Controller
     public function store(RestockRequest $request, Ingredient $ingredient, StockService $stock): RedirectResponse
     {
         try {
-            $stock->restock($ingredient, $request->validated('quantity'), $request->validated('unit_cost'), $request->user(), $request->validated('note'));
+            $stock->restockFromTotal($ingredient, $request->validated('quantity'), $request->validated('total_cost'), $request->user(), $request->validated('note'));
         } catch (StockException $exception) {
             return back()->withInput()->withErrors(['quantity' => $exception->getMessage()]);
         }

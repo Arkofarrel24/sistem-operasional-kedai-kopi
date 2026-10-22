@@ -19,7 +19,7 @@ test('restock adds stock and records a restock movement with unit cost and suppl
     $this->actingAs($this->owner)
         ->post(route('owner.stock.restock.store', $this->coffee), [
             'quantity' => '500',
-            'unit_cost' => '280',
+            'total_cost' => '140000', // Rp280 / gram
             'note' => 'Toko Sumber Rejeki, nota 0412',
         ])
         ->assertRedirect(route('owner.stock.index'))
@@ -49,10 +49,10 @@ test('restock updates cost per unit with the weighted average', function (string
 
 test('restock validation messages are in Indonesian', function () {
     $this->actingAs($this->owner)
-        ->post(route('owner.stock.restock.store', $this->coffee), ['quantity' => '0', 'unit_cost' => ''])
+        ->post(route('owner.stock.restock.store', $this->coffee), ['quantity' => '0', 'total_cost' => ''])
         ->assertSessionHasErrors([
             'quantity' => 'Jumlah harus lebih besar dari 0.',
-            'unit_cost' => 'Harga beli per satuan wajib diisi.',
+            'total_cost' => 'Total harga nota wajib diisi.',
         ]);
 
     expect($this->coffee->refresh()->current_stock)->toBe('1000.00');
@@ -108,7 +108,7 @@ test('waste records a negative movement with its reason', function () {
     $this->actingAs($this->owner)
         ->post(route('owner.stock.waste.store', $this->coffee), ['quantity' => '36', 'reason' => 'Tumpah saat menggiling'])
         ->assertRedirect(route('owner.stock.index'))
-        ->assertSessionHas('status', 'Waste Biji Kopi 36 gram dicatat.');
+        ->assertSessionHas('status', 'Bahan terbuang: Biji Kopi 36 gram dicatat.');
 
     $movement = $this->coffee->stockMovements()->where('type', StockMovementType::Waste)->sole();
     expect($this->coffee->refresh()->current_stock)->toBe('964.00')
@@ -124,7 +124,7 @@ test('waste above the current stock is rejected and nothing changes', function (
         ->from(route('owner.stock.waste.create', $this->coffee))
         ->post(route('owner.stock.waste.store', $this->coffee), ['quantity' => '1000.01', 'reason' => 'Basi'])
         ->assertRedirect(route('owner.stock.waste.create', $this->coffee))
-        ->assertSessionHasErrors(['quantity' => 'Jumlah waste (1.000,01 gram) melebihi stok saat ini (1.000 gram).']);
+        ->assertSessionHasErrors(['quantity' => 'Jumlah terbuang (1.000,01 gram) melebihi stok saat ini (1.000 gram).']);
 
     expect($this->coffee->refresh()->current_stock)->toBe('1000.00')
         ->and(StockMovement::count())->toBe($before);
@@ -145,4 +145,24 @@ test('adjustment, waste and restock never change cost per unit except restock', 
     $this->stock->recordWaste($this->coffee, '100', $this->owner, 'Basi');
 
     expect($this->coffee->refresh()->cost_per_unit)->toBe('250.00');
+});
+
+test('restock derives the unit cost from the bill total, rounded half up', function () {
+    expect($this->stock->unitCostFromTotal('6000', '333'))->toBe('18.02') // 18.018
+        ->and($this->stock->unitCostFromTotal('137000', '500'))->toBe('274.00')
+        ->and($this->stock->unitCostFromTotal('0', '10'))->toBe('0.00');
+
+    $this->stock->restockFromTotal($this->coffee, '500', '140000', $this->owner);
+
+    expect($this->coffee->stockMovements()->where('type', StockMovementType::Restock)->sole()->unit_cost)->toBe('280.00');
+});
+
+test('stock overview lists the most urgent ingredients first', function () {
+    stockedIngredient('Air Mineral', Unit::Pcs, 100, ['min_stock' => 10]);    // ok
+    stockedIngredient('Botol 1 L', Unit::Pcs, 0, ['min_stock' => 10]);        // out
+    stockedIngredient('Cokelat', Unit::Gram, 50, ['min_stock' => 300]);      // low
+
+    $this->actingAs($this->owner)
+        ->get(route('owner.stock.index'))
+        ->assertSeeInOrder(['Botol 1 L', 'Cokelat', 'Air Mineral', 'Biji Kopi']);
 });

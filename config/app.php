@@ -15,6 +15,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Second line of the receipt header (city or street address of the shop).
+    'store_address' => env('STORE_ADDRESS', 'Surabaya'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

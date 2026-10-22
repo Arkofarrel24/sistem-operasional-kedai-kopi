@@ -29,14 +29,21 @@
     @if ($product->image_url)
         <img src="{{ $product->image_url }}" alt="Foto {{ $product->name }}" class="mt-2 h-24 w-24 rounded-lg object-cover">
     @endif
-    <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp"
-           class="mt-2 block w-full text-sm text-stone-600 file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-stone-200">
-    <p class="mt-1 text-xs text-stone-500">JPG, PNG, atau WebP, maksimal 2 MB.{{ $product->image ? ' Unggah foto baru untuk mengganti.' : '' }}</p>
+    {{-- The native file control speaks the browser's language ("Choose File"); this one speaks Indonesian. --}}
+    <div class="mt-2 flex items-center gap-3" x-data="{ name: '' }">
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="peer sr-only"
+               x-on:change="name = $event.target.files[0]?.name ?? ''">
+        <label for="image" class="press inline-flex h-10 shrink-0 cursor-pointer items-center rounded-lg bg-white px-4 text-sm font-semibold text-stone-800 ring-1 ring-inset ring-stone-300 hover:bg-stone-50 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-amber-600">
+            {{ $product->image ? 'Ganti foto' : 'Pilih foto' }}
+        </label>
+        <span class="min-w-0 truncate text-sm text-stone-600" x-text="name || 'Belum ada file dipilih'">Belum ada file dipilih</span>
+    </div>
+    <p class="mt-1 text-xs text-stone-600">JPG, PNG, atau WebP, maksimal 2 MB.{{ $product->image ? ' Unggah foto baru untuk mengganti.' : '' }}</p>
     <x-input-error :messages="$errors->get('image')" class="mt-2" />
 </div>
 
 <label class="flex items-center gap-2">
-    <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+    <input type="checkbox" name="is_active" value="1" class="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
            @checked(old('is_active', $product->is_active))>
     <span class="text-sm">Aktif (tampil di kasir jika resep sudah diisi)</span>
 </label>

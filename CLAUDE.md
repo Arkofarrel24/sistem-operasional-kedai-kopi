@@ -48,3 +48,4 @@ php artisan test
 ## Akun demo (setelah seeder)
 - Owner: `owner@demo.test` / `password`
 - Kasir: `kasir1@demo.test`, `kasir2@demo.test` / `password`
+- Kasir nonaktif: `kasir3@demo.test` / `password` (tidak bisa login; untuk demo manajemen pengguna)

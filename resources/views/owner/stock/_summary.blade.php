@@ -1,5 +1,5 @@
 @php($unit = $ingredient->unit->label())
-<dl class="grid gap-4 rounded-lg bg-stone-50 p-4 text-center text-sm sm:grid-cols-3">
+<dl class="grid gap-4 rounded-lg bg-stone-50 p-4 text-sm sm:grid-cols-3">
     <div>
         <dt class="text-stone-500">Bahan</dt>
         <dd class="font-medium">{{ $ingredient->name }}</dd>

@@ -1,11 +1,11 @@
-<x-owner-layout title="Catat Waste">
-    <x-card class="mx-auto max-w-2xl p-6">
+<x-owner-layout title="Catat Bahan Terbuang">
+    <x-card class="max-w-2xl p-6">
         @include('owner.stock._summary')
 
         <x-confirm-form :action="route('owner.stock.waste.store', $ingredient)" class="mt-6 space-y-6"
-                        :title="'Catat waste '.$ingredient->name.'?'"
-                        message="Stok bahan berkurang sebesar jumlah yang Anda isi dan tercatat di riwayat stok. Catatan waste tidak bisa dihapus; kesalahan hanya bisa dikoreksi lewat penyesuaian stok."
-                        confirm="Catat waste">
+                        :title="'Catat '.$ingredient->name.' terbuang?'"
+                        message="Stok bahan berkurang sebesar jumlah yang Anda isi dan tercatat di riwayat stok. Catatan ini tidak bisa dihapus; kesalahan hanya bisa dikoreksi lewat penyesuaian stok."
+                        confirm="Catat terbuang">
             <div>
                 <x-input-label for="quantity" value="Jumlah terbuang ({{ $ingredient->unit->label() }})" />
                 <x-text-input id="quantity" name="quantity" type="number" min="0.01" step="0.01" inputmode="decimal"
@@ -19,8 +19,8 @@
                 <x-input-error :messages="$errors->get('reason')" class="mt-2" />
             </div>
 
-            <div class="flex items-center justify-center gap-3">
-                <x-danger-button>Simpan waste</x-danger-button>
+            <div class="flex items-center gap-3">
+                <x-danger-button>Simpan</x-danger-button>
                 <a href="{{ route('owner.stock.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>
             </div>
         </x-confirm-form>

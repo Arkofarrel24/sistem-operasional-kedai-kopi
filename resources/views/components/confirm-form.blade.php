@@ -5,16 +5,17 @@
     'message',
     'confirm',
     'danger' => true,
+    'when' => 'true',
 ])
 
 {{--
     A form that asks for confirmation before an action that cannot be undone. The trigger is a normal
     submit button in the slot; submitting opens the dialog, and only "confirm" really submits.
     Without JavaScript the form simply submits. The dialog is teleported to <body> so table cells or
-    animated cards never clip it.
+    animated cards never clip it. `when` is a JS expression: only ask when it is true (e.g. a non-empty cart).
 --}}
 <form method="POST" action="{{ $action }}" novalidate x-data="{ open: false }" x-ref="form"
-      x-on:submit.prevent="open = true" {{ $attributes }}>
+      x-on:submit="if ({{ $when }}) { $event.preventDefault(); open = true }" {{ $attributes }}>
     @csrf
     @unless (strtoupper($method) === 'POST')
         @method($method)

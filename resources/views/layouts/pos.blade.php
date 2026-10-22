@@ -21,7 +21,12 @@
                     <x-application-logo class="h-8 w-8 shrink-0 text-amber-400" />
                     <div class="hidden leading-tight sm:block">
                         <p class="text-lg font-semibold">{{ config('app.name') }}</p>
-                        <p class="text-xs text-stone-400">{{ now()->translatedFormat('j M Y') }}</p>
+                        <p class="text-xs text-stone-400">
+                            {{ now()->translatedFormat('j M Y') }},
+                            <time x-data="{ time: @js(now()->format('H.i')) }"
+                                  x-init="setInterval(() => time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }), 15000)"
+                                  x-text="time" class="tabular-nums">{{ now()->format('H.i') }}</time>
+                        </p>
                     </div>
                 </div>
 
@@ -42,8 +47,11 @@
                         <p class="max-w-[12rem] truncate text-base font-medium">{{ auth()->user()->name }}</p>
                         <p class="text-xs text-stone-400">{{ auth()->user()->role->label() }}</p>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
+                    {{-- Logging out drops an unpaid cart, so ask first when there is one. --}}
+                    <x-confirm-form :action="route('logout')" title="Keluar dari kasir?"
+                                    message="Pesanan yang belum dibayar akan hilang jika Anda keluar sekarang."
+                                    confirm="Keluar"
+                                    when="Number(document.getElementById('pos-register')?.dataset.cartCount) > 0">
                         <button type="submit"
                                 class="flex h-12 items-center gap-2 rounded-xl bg-stone-800 px-4 text-base font-medium text-stone-100 hover:bg-stone-700 active:bg-stone-600">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
@@ -51,7 +59,7 @@
                             </svg>
                             Keluar
                         </button>
-                    </form>
+                    </x-confirm-form>
                 </div>
             </header>
 

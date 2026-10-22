@@ -11,19 +11,24 @@ class UpdateRecipeRequest extends FormRequest
         return true; // role is enforced by the route middleware
     }
 
-    protected function prepareForValidation(): void
-    {
-        // One bag per recipe row so the message shows under the row that failed.
-        $this->errorBag = 'recipe-'.$this->route('recipe')->id;
-    }
-
     /**
+     * quantities[recipe id] => quantity per portion, for all rows of the recipe at once.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'quantity' => ['required', 'decimal:0,2', 'gt:0', 'max:99999999'],
+            'quantities' => ['required', 'array'],
+            'quantities.*' => ['required', 'decimal:0,2', 'gt:0', 'max:99999999'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return ['quantities.*' => 'jumlah'];
     }
 }

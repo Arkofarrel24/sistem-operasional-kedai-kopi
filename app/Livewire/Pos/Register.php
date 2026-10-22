@@ -49,7 +49,7 @@ class Register extends Component
     public function menu(): \Illuminate\Support\Collection
     {
         return Product::sellable()
-            ->with('category')
+            ->with(['category', 'recipes.ingredient'])
             ->when(trim($this->search) !== '', fn ($query) => $query->where('name', 'like', '%'.trim($this->search).'%'))
             ->when($this->categoryId, fn ($query, $categoryId) => $query->where('category_id', $categoryId))
             ->get()
@@ -63,7 +63,44 @@ class Register extends Component
     #[Computed]
     public function cartProducts(): Collection
     {
-        return Product::whereIn('id', array_keys($this->cart))->get()->keyBy('id');
+        return Product::with('recipes.ingredient')->whereIn('id', array_keys($this->cart))->get()->keyBy('id');
+    }
+
+    /**
+     * Portions still possible per product (menu and cart), after the cart's own usage. A hint only:
+     * checkout re-checks the stock under lock.
+     *
+     * @return array<int, int> product id => portions (negative when the cart already needs too much)
+     */
+    #[Computed]
+    public function availability(): array
+    {
+        $products = $this->menu->flatten(1)->concat($this->cartProducts->values())->unique('id');
+
+        return app(SaleService::class)->availablePortions(
+            new Collection($products->all()),
+            array_map(fn (array $line) => (int) $line['quantity'], $this->cart),
+        );
+    }
+
+    /**
+     * Cart lines the stock cannot cover, with the largest quantity it can.
+     *
+     * @return array<int, int> product id => quantity that still fits
+     */
+    #[Computed]
+    public function lineLimits(): array
+    {
+        $limits = [];
+
+        foreach ($this->cart as $productId => $line) {
+            $more = $this->availability[$productId] ?? 0;
+            if ($more < 0) {
+                $limits[$productId] = max(0, $line['quantity'] + $more);
+            }
+        }
+
+        return $limits;
     }
 
     #[Computed]
@@ -148,7 +185,15 @@ class Register extends Component
 
     public function add(int $productId): void
     {
-        if (! Product::sellable()->whereKey($productId)->exists()) {
+        $product = Product::sellable()->find($productId);
+
+        if (! $product) {
+            return;
+        }
+
+        if (($this->availability[$productId] ?? 0) <= 0) {
+            $this->addError('menu', "Stok bahan untuk {$product->name} tidak cukup untuk 1 porsi lagi.");
+
             return;
         }
 
@@ -164,9 +209,56 @@ class Register extends Component
     public function increment(int $productId): void
     {
         if (isset($this->cart[$productId])) {
-            $this->cart[$productId]['quantity'] = min($this->cart[$productId]['quantity'] + 1, SaleService::MAX_QUANTITY);
-            $this->cartChanged();
+            $this->add($productId);
         }
+    }
+
+    /**
+     * Quantity typed into a cart line, or picked from the stock hint; 0 removes the line.
+     */
+    public function setQuantity(int $productId, mixed $quantity): void
+    {
+        if (! isset($this->cart[$productId])) {
+            return;
+        }
+
+        $quantity = filter_var($quantity, FILTER_VALIDATE_INT);
+        if ($quantity === false || $quantity < 0) {
+            $this->cartChanged(); // re-render the field with the last valid quantity
+
+            return;
+        }
+
+        if ($quantity === 0) {
+            unset($this->cart[$productId]);
+        } else {
+            $this->cart[$productId]['quantity'] = min($quantity, SaleService::MAX_QUANTITY);
+        }
+
+        $this->cartChanged();
+    }
+
+    /**
+     * Enter in the search box: add the first menu item that still has stock, then clear the search.
+     */
+    public function addFirstMatch(string $search = ''): void
+    {
+        $this->search = $search;
+        unset($this->menu, $this->availability);
+
+        $product = $this->menu->flatten(1)->first(fn (Product $product) => ($this->availability[$product->id] ?? 0) > 0);
+
+        if (! $product) {
+            if ($this->menu->isNotEmpty()) {
+                $this->addError('menu', 'Stok bahan untuk menu yang dicari tidak cukup.');
+            }
+
+            return;
+        }
+
+        $this->add($product->id);
+        $this->search = '';
+        unset($this->menu, $this->availability);
     }
 
     public function decrement(int $productId): void
@@ -227,6 +319,8 @@ class Register extends Component
                 $this->paymentMethod === PaymentMethod::Cash->value ? $this->paidAmount : null,
             );
         } catch (CheckoutException $exception) {
+            // Stock may have changed since the page was drawn (another cashier): refresh the hints.
+            unset($this->cartProducts, $this->availability, $this->lineLimits);
             $this->addError('checkout', $exception->getMessage());
 
             return;
@@ -291,7 +385,7 @@ class Register extends Component
 
     private function cartChanged(): void
     {
-        unset($this->cartProducts, $this->total, $this->itemCount, $this->cashDifference, $this->quickAmounts);
+        unset($this->cartProducts, $this->total, $this->itemCount, $this->cashDifference, $this->quickAmounts, $this->availability, $this->lineLimits);
         $this->resetErrorBag();
     }
 

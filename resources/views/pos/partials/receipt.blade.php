@@ -2,7 +2,7 @@
 <div class="receipt-printable mx-auto w-full max-w-[19rem] bg-white px-5 py-6 font-mono text-[13px] leading-relaxed text-stone-900 shadow-sm">
     <div class="text-center">
         <p class="text-base font-bold">{{ config('app.name') }}</p>
-        <p>Surabaya</p>
+        <p>{{ config('app.store_address') }}</p>
     </div>
 
     @if ($sale->isVoid())

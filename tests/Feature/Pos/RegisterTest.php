@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use App\Services\StockService;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -139,21 +140,58 @@ test('an empty cart cannot be checked out', function () {
         ->assertHasErrors(['cart' => 'Keranjang masih kosong.']);
 });
 
-test('insufficient stock is shown and the cart is kept', function () {
+test('the grid shows how many portions are left and refuses to add past the stock', function () {
     $id = $this->esKopiSusu->id;
 
     ($this->register)()
+        ->assertSee('Sisa 2') // 300 ml milk, 150 ml per portion
         ->call('add', $id)
         ->call('add', $id)
-        ->call('add', $id) // needs 450 ml milk, 300 ml in stock
-        ->call('selectPayment', 'qris')
+        ->assertSee('Stok maksimal')
+        ->call('add', $id)
+        ->assertHasErrors(['menu' => 'Stok bahan untuk Es Kopi Susu tidak cukup untuk 1 porsi lagi.'])
+        ->assertSet("cart.{$id}.quantity", 2);
+});
+
+test('stock used up after adding is flagged on the cart line, checkout is refused and the cart is kept', function () {
+    $id = $this->esKopiSusu->id;
+    $register = ($this->register)()->call('add', $id)->call('add', $id);
+
+    // Meanwhile 150 ml of milk is spilled: only one portion is left for the two in the cart.
+    app(StockService::class)->recordWaste($this->milk, '150', User::factory()->owner()->create(), 'Tumpah');
+
+    $register->call('selectPayment', 'qris')
         ->call('checkout')
         ->assertHasErrors('checkout')
-        ->assertSee('Stok tidak cukup: Susu UHT kurang 150 ml.')
-        ->assertSet("cart.{$id}.quantity", 3)
-        ->assertSet('completedSaleId', null);
+        ->assertSee(['Stok tidak cukup: Susu UHT kurang 150 ml.', 'Stok bahan hanya cukup untuk 1 porsi.', 'Kurangi ke 1'])
+        ->assertSet("cart.{$id}.quantity", 2)
+        ->assertSet('completedSaleId', null)
+        ->call('setQuantity', $id, 1)
+        ->assertDontSee('Kurangi ke 1')
+        ->call('checkout')
+        ->assertHasNoErrors();
 
-    expect(Sale::count())->toBe(0);
+    expect(Sale::sole()->items->sole()->quantity)->toBe(1);
+});
+
+test('enter in the search adds the first match and clears the search', function () {
+    ($this->register)()
+        ->call('addFirstMatch', 'teh')
+        ->assertSet("cart.{$this->esTeh->id}.quantity", 1)
+        ->assertSet('search', '');
+});
+
+test('a typed quantity replaces the line quantity, zero removes the line', function () {
+    $id = $this->americano->id;
+
+    ($this->register)()
+        ->call('add', $id)
+        ->call('setQuantity', $id, '12')
+        ->assertSet("cart.{$id}.quantity", 12)
+        ->call('setQuantity', $id, 'abc')
+        ->assertSet("cart.{$id}.quantity", 12)
+        ->call('setQuantity', $id, '0')
+        ->assertSet('cart', []);
 });
 
 test('a tampered cart cannot sell a hidden product', function () {

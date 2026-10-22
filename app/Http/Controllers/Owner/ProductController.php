@@ -37,6 +37,8 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => Category::orderBy('name')->get(),
             'filters' => $filters,
+            // Menus that never reach the register until they get a recipe (PLAN.md rule 6).
+            'withoutRecipe' => Product::where('is_active', true)->doesntHave('recipes')->count(),
         ]);
     }
 

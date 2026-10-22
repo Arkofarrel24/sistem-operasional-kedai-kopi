@@ -17,7 +17,7 @@ enum StockMovementType: string
             self::Sale => 'Penjualan',
             self::VoidReturn => 'Pengembalian void',
             self::Adjustment => 'Penyesuaian',
-            self::Waste => 'Waste',
+            self::Waste => 'Terbuang',
         };
     }
 }

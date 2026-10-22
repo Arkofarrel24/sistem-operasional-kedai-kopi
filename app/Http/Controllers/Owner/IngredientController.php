@@ -14,7 +14,7 @@ class IngredientController extends Controller
 {
     public function index(): View
     {
-        $ingredients = Ingredient::orderBy('name')->paginate(20);
+        $ingredients = Ingredient::withCount('products')->orderBy('name')->paginate(20);
 
         return view('owner.ingredients.index', compact('ingredients'));
     }

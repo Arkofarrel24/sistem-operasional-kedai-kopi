@@ -38,7 +38,7 @@ function stockRouteUrl(string $name, $ingredient, Sale $sale): string
 
 test('cashier gets 403 on stock and void routes', function (string $method, string $name) {
     $this->actingAs($this->cashier)
-        ->{$method}(stockRouteUrl($name, $this->coffee, $this->sale), ['quantity' => '10', 'unit_cost' => '1', 'counted_stock' => '0', 'reason' => 'x'])
+        ->{$method}(stockRouteUrl($name, $this->coffee, $this->sale), ['quantity' => '10', 'total_cost' => '1', 'counted_stock' => '0', 'reason' => 'x'])
         ->assertForbidden();
 
     expect($this->coffee->refresh()->current_stock)->toBe('982.00')

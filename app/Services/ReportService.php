@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use App\Enums\StockMovementType;
 use App\Models\Ingredient;
+use App\Models\Sale;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
@@ -203,6 +204,31 @@ class ReportService
      *
      * @return EloquentCollection<int, Ingredient>
      */
+    /**
+     * Totals for a filtered list of sales (the owner's Transaksi page): every row counts, only
+     * completed sales add to the revenue.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Sale>  $sales
+     * @return array{count: int, completed: int, void: int, revenue: string}
+     */
+    public function salesTotals(\Illuminate\Database\Eloquent\Builder $sales): array
+    {
+        $completed = SaleStatus::Completed->value;
+
+        $row = $sales->clone()->toBase()->reorder()
+            ->selectRaw('COUNT(*) as count')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as completed', [$completed])
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = ? THEN total ELSE 0 END), 0) as revenue', [$completed])
+            ->first();
+
+        return [
+            'count' => (int) $row->count,
+            'completed' => (int) $row->completed,
+            'void' => (int) $row->count - (int) $row->completed,
+            'revenue' => (string) $row->revenue,
+        ];
+    }
+
     public function lowStockIngredients(): EloquentCollection
     {
         return Ingredient::query()

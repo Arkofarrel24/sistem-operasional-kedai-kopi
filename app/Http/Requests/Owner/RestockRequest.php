@@ -12,13 +12,15 @@ class RestockRequest extends FormRequest
     }
 
     /**
+     * The owner types the total on the supplier's bill; StockService derives the unit cost.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
             'quantity' => ['required', 'decimal:0,2', 'gt:0', 'max:9999999999'],
-            'unit_cost' => ['required', 'decimal:0,2', 'min:0', 'max:99999999'],
+            'total_cost' => ['required', 'decimal:0,2', 'min:0', 'max:9999999999'],
             'note' => ['nullable', 'string', 'max:255'],
         ];
     }

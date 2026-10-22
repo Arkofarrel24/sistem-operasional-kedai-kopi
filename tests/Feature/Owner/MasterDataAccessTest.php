@@ -29,7 +29,7 @@ function masterDataRoutes(): array
         ['get', 'owner.products.edit', [$product]],
         ['put', 'owner.products.update', [$product]],
         ['post', 'owner.products.recipes.store', [$product]],
-        ['put', 'owner.products.recipes.update', [$product, $recipe]],
+        ['put', 'owner.products.recipes.update-all', [$product]],
         ['delete', 'owner.products.recipes.destroy', [$product, $recipe]],
         ['get', 'owner.ingredients.index', []],
         ['get', 'owner.ingredients.create', []],

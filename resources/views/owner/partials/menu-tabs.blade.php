@@ -1,4 +1,4 @@
-<nav class="mb-4 flex justify-center gap-1 border-b border-stone-200" aria-label="Menu dan kategori">
+<nav class="mb-4 flex gap-1 border-b border-stone-200" aria-label="Menu dan kategori">
     @foreach (['owner.products.index' => 'Daftar Menu', 'owner.categories.index' => 'Kategori'] as $route => $label)
         @php($active = request()->routeIs(str_replace('.index', '.*', $route)))
         <a href="{{ route($route) }}"

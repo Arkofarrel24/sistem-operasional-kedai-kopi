@@ -10,7 +10,7 @@ beforeEach(function () {
     $this->owner = User::factory()->owner()->create();
 });
 
-test('owner can list ingredients with current and minimum stock', function () {
+test('owner can list ingredient definitions; current stock lives on the stock page', function () {
     $ingredient = Ingredient::factory()->create(['name' => 'Susu UHT', 'unit' => Unit::Ml, 'min_stock' => 5000, 'cost_per_unit' => 18]);
     app(StockService::class)->recordInitialStock($ingredient, '12000', $this->owner);
 
@@ -18,9 +18,10 @@ test('owner can list ingredients with current and minimum stock', function () {
         ->get(route('owner.ingredients.index'))
         ->assertOk()
         ->assertSee('Susu UHT')
-        ->assertSee('12.000 ml')
         ->assertSee('5.000 ml')
-        ->assertSee('Rp18 / ml');
+        ->assertSee('Rp18 / ml')
+        ->assertSee('Belum dipakai')
+        ->assertDontSee('12.000 ml');
 });
 
 test('creating an ingredient books the opening stock as a stock movement', function () {

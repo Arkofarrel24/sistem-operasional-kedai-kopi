@@ -70,14 +70,17 @@ test('recipe quantity must be greater than zero', function () {
     expect($this->product->recipes()->count())->toBe(0);
 });
 
-test('owner can update a recipe quantity', function () {
+test('owner can update all recipe quantities at once', function () {
     $recipe = Recipe::factory()->for($this->product)->for($this->coffee)->create(['quantity' => 18]);
+    $milk = stockedIngredient('Susu', Unit::Ml, 1000);
+    $milkRow = Recipe::factory()->for($this->product)->for($milk)->create(['quantity' => 150]);
 
     $this->actingAs($this->owner)
-        ->put(route('owner.products.recipes.update', [$this->product, $recipe]), ['quantity' => '20.5'])
+        ->put(route('owner.products.recipes.update-all', $this->product), ['quantities' => [$recipe->id => '20.5', $milkRow->id => '160']])
         ->assertRedirect(route('owner.products.edit', $this->product).'#resep');
 
-    expect($recipe->fresh()->quantity)->toBe('20.50');
+    expect($recipe->fresh()->quantity)->toBe('20.50')
+        ->and($milkRow->fresh()->quantity)->toBe('160.00');
 });
 
 test('owner can remove an ingredient from a recipe', function () {
@@ -94,9 +97,10 @@ test('a recipe row cannot be changed through another product', function () {
     $otherProduct = Product::factory()->create();
     $recipe = Recipe::factory()->for($otherProduct)->for($this->coffee)->create(['quantity' => 18]);
 
+    // Ids of another product's rows are ignored.
     $this->actingAs($this->owner)
-        ->put(route('owner.products.recipes.update', [$this->product, $recipe]), ['quantity' => '99'])
-        ->assertNotFound();
+        ->put(route('owner.products.recipes.update-all', $this->product), ['quantities' => [$recipe->id => '99']])
+        ->assertRedirect();
 
     $this->actingAs($this->owner)
         ->delete(route('owner.products.recipes.destroy', [$this->product, $recipe]))
@@ -111,15 +115,15 @@ test('invalid recipe quantity update is reported under that recipe row', functio
 
     $this->actingAs($this->owner)
         ->from($edit)
-        ->put(route('owner.products.recipes.update', [$this->product, $recipe]), ['quantity' => ''])
-        ->assertSessionHasErrorsIn('recipe-'.$recipe->id, ['quantity' => 'Jumlah wajib diisi.']);
+        ->put(route('owner.products.recipes.update-all', $this->product), ['quantities' => [$recipe->id => '']])
+        ->assertSessionHasErrors(["quantities.{$recipe->id}" => 'Jumlah wajib diisi.']);
 
     expect($recipe->fresh()->quantity)->toBe('18.00');
 
     $html = $this->actingAs($this->owner)
         ->from($edit)
         ->followingRedirects()
-        ->put(route('owner.products.recipes.update', [$this->product, $recipe]), ['quantity' => ''])
+        ->put(route('owner.products.recipes.update-all', $this->product), ['quantities' => [$recipe->id => '']])
         ->assertOk()
         ->getContent();
 

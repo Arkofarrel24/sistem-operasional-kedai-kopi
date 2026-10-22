@@ -1,5 +1,5 @@
 <x-owner-layout title="Tambah Bahan">
-    <x-card class="mx-auto max-w-2xl p-6">
+    <x-card class="max-w-2xl p-6">
         <form novalidate method="POST" action="{{ route('owner.ingredients.store') }}" class="space-y-6">
             @csrf
 
@@ -43,13 +43,13 @@
             </div>
 
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                <input type="checkbox" name="is_active" value="1" class="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
                        @checked(old('is_active', true))>
                 <span class="text-sm">Aktif (bahan nonaktif membuat menu yang memakainya tidak tampil di kasir)</span>
             </label>
             <x-input-error :messages="$errors->get('is_active')" class="mt-2" />
 
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center gap-3">
                 <x-primary-button>Simpan</x-primary-button>
                 <a href="{{ route('owner.ingredients.index') }}" class="text-sm text-stone-600 hover:underline">Batal</a>
             </div>

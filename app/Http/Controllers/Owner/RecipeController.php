@@ -8,6 +8,7 @@ use App\Http\Requests\Owner\UpdateRecipeRequest;
 use App\Models\Product;
 use App\Models\Recipe;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
 {
@@ -18,11 +19,23 @@ class RecipeController extends Controller
         return $this->backToProduct($product, 'Bahan ditambahkan ke resep.');
     }
 
-    public function update(UpdateRecipeRequest $request, Product $product, Recipe $recipe): RedirectResponse
+    /**
+     * Save every quantity of the recipe at once, so editing several rows never loses one.
+     * Ids that are not this product's recipe rows are ignored.
+     */
+    public function updateAll(UpdateRecipeRequest $request, Product $product): RedirectResponse
     {
-        $recipe->update($request->validated());
+        $quantities = $request->validated('quantities');
 
-        return $this->backToProduct($product, 'Jumlah bahan diperbarui.');
+        DB::transaction(function () use ($product, $quantities) {
+            foreach ($product->recipes as $recipe) {
+                if (isset($quantities[$recipe->id])) {
+                    $recipe->update(['quantity' => $quantities[$recipe->id]]);
+                }
+            }
+        });
+
+        return $this->backToProduct($product, 'Resep disimpan.');
     }
 
     public function destroy(Product $product, Recipe $recipe): RedirectResponse

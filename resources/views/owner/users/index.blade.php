@@ -10,7 +10,7 @@
         $actionSlots = 'grid grid-cols-[3.5rem_9rem_6.5rem] items-center gap-x-1 text-sm';
     @endphp
 
-    <div class="mx-auto max-w-5xl">
+    <div class="max-w-5xl">
         <x-card>
             <div class="{{ $columns }} hidden border-b border-stone-100 px-6 py-3 text-xs font-medium text-stone-500" aria-hidden="true">
                 <span>Pengguna</span>
@@ -80,6 +80,6 @@
         </x-card>
 
         <div class="mt-4">{{ $users->links() }}</div>
-        <p class="mt-4 text-center text-xs text-stone-500">Pengguna tidak dihapus karena transaksi dan riwayat stok mencatat namanya. Nonaktifkan pengguna yang sudah tidak bekerja.</p>
+        <p class="mt-4 text-xs text-stone-600">Pengguna tidak dihapus karena transaksi dan riwayat stok mencatat namanya. Nonaktifkan pengguna yang sudah tidak bekerja.</p>
     </div>
 </x-owner-layout>

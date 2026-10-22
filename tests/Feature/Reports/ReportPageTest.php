@@ -27,7 +27,7 @@ test('report shows the hand-computed figures for one inclusive day', function ()
         ->assertSeeInOrder(['Rekap penjualan', 'Rp147.000', '4', 'Rp36.750'])
         ->assertSeeInOrder(['Tunai', '2 transaksi', 'Rp86.000', 'QRIS', '1 transaksi', 'Rp36.000', 'Transfer', '1 transaksi', 'Rp25.000'])
         ->assertSeeInOrder(['Laba kotor', 'Margin', '67,3%', 'Rp147.000', 'Rp48.000', 'Rp99.000'])
-        ->assertSeeInOrder(['Nilai waste', 'Rp9.000', 'Susu UHT'])
+        ->assertSeeInOrder(['Nilai bahan terbuang', 'Rp9.000', 'Susu UHT'])
         ->assertSeeInOrder(['Menu terlaris', 'Latte', '3', 'Rp75.000', 'Americano', '4', 'Rp72.000'])
         ->assertSee('Paling ramai pukul 08.00');
 });

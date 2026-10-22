@@ -1,18 +1,18 @@
 @php
     $navItems = [
-        ['label' => 'Dashboard', 'route' => 'owner.dashboard', 'active' => 'owner.dashboard',
+        ['group' => 'Ringkasan', 'label' => 'Beranda', 'route' => 'owner.dashboard', 'active' => 'owner.dashboard',
             'icon' => 'm2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'],
-        ['label' => 'Menu', 'route' => 'owner.products.index', 'active' => ['owner.products.*', 'owner.categories.*'],
+        ['group' => 'Data master', 'label' => 'Menu', 'route' => 'owner.products.index', 'active' => ['owner.products.*', 'owner.categories.*'],
             'icon' => 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z'],
-        ['label' => 'Bahan', 'route' => 'owner.ingredients.index', 'active' => 'owner.ingredients.*',
+        ['group' => 'Data master', 'label' => 'Bahan', 'route' => 'owner.ingredients.index', 'active' => 'owner.ingredients.*',
             'icon' => 'M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5'],
-        ['label' => 'Stok', 'route' => 'owner.stock.index', 'active' => 'owner.stock.*',
+        ['group' => 'Operasional', 'label' => 'Stok', 'route' => 'owner.stock.index', 'active' => 'owner.stock.*',
             'icon' => 'm20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z'],
-        ['label' => 'Transaksi', 'route' => 'owner.sales.index', 'active' => 'owner.sales.*',
+        ['group' => 'Operasional', 'label' => 'Transaksi', 'route' => 'owner.sales.index', 'active' => 'owner.sales.*',
             'icon' => 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z'],
-        ['label' => 'Laporan', 'route' => 'owner.reports.index', 'active' => 'owner.reports.*',
+        ['group' => 'Ringkasan', 'label' => 'Laporan', 'route' => 'owner.reports.index', 'active' => 'owner.reports.*',
             'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z'],
-        ['label' => 'Pengguna', 'route' => 'owner.users.index', 'active' => 'owner.users.*',
+        ['group' => 'Admin', 'label' => 'Pengguna', 'route' => 'owner.users.index', 'active' => 'owner.users.*',
             'icon' => 'M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z'],
     ];
 @endphp
@@ -46,8 +46,13 @@
                     <span class="text-lg font-semibold text-white">{{ config('app.name') }}</span>
                 </div>
 
-                <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-                    @foreach ($navItems as $item)
+                {{-- Grouped by job: what happened, day-to-day work, the menu's definitions, people. --}}
+                <nav class="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+                    @foreach (collect($navItems)->groupBy('group')->sortBy(fn ($items, $group) => array_search($group, ['Ringkasan', 'Operasional', 'Data master', 'Admin'])) as $group => $items)
+                    <div>
+                    <p class="px-3 pb-1.5 text-xs font-medium text-stone-400">{{ $group }}</p>
+                    <div class="space-y-1">
+                    @foreach ($items as $item)
                         @php($active = request()->routeIs(...(array) $item['active']))
                         <a href="{{ route($item['route']) }}"
                            @class([
@@ -61,6 +66,9 @@
                             </svg>
                             {{ $item['label'] }}
                         </a>
+                    @endforeach
+                    </div>
+                    </div>
                     @endforeach
                 </nav>
 
@@ -81,25 +89,24 @@
 
             {{-- Main column --}}
             <div class="lg:pl-64">
-                {{-- Three columns so the page title sits exactly in the middle: menu button | title | actions --}}
-                <header class="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-stone-200 bg-white px-4 sm:px-6">
-                    <div class="flex items-center">
-                        <button type="button" class="-ml-1 rounded-md p-2 text-stone-600 hover:bg-stone-100 lg:hidden"
-                                @click="sidebarOpen = true" aria-label="Buka menu">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                            </svg>
-                        </button>
-                    </div>
-                    <h1 class="truncate text-center text-lg font-semibold">{{ $title ?? config('app.name') }}</h1>
-                    <div class="flex items-center justify-end gap-2">
-                        @isset($actions)
+                {{-- Title on the left edge the content shares; page actions on the right. On phones the
+                     actions move to a bar at the bottom of the screen, within thumb reach. --}}
+                <header class="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-stone-200 bg-white px-4 sm:px-6">
+                    <button type="button" class="-ml-2 rounded-md p-2 text-stone-600 hover:bg-stone-100 lg:hidden"
+                            @click="sidebarOpen = true" aria-label="Buka menu">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                    </button>
+                    <h1 class="min-w-0 flex-1 truncate text-xl font-semibold tracking-tight">{{ $title ?? config('app.name') }}</h1>
+                    @isset($actions)
+                        <div class="fixed inset-x-0 bottom-0 z-20 flex items-center justify-end gap-2 border-t border-stone-200 bg-white/95 px-4 py-3 backdrop-blur [padding-bottom:max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:z-auto sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none [&>*]:flex-1 sm:[&>*]:flex-none">
                             {{ $actions }}
-                        @endisset
-                    </div>
+                        </div>
+                    @endisset
                 </header>
 
-                <main class="p-4 sm:p-6">
+                <main @class(['p-4 sm:p-6', 'pb-24 sm:pb-6' => isset($actions)])>
                     <x-flash />
 
                     {{ $slot }}

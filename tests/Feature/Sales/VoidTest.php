@@ -168,3 +168,15 @@ test('owner sale list filters by date, cashier and status', function () {
     $list(['status' => 'void'])->assertSee($voided->invoice_no)->assertDontSee($budiSale->invoice_no);
     $list(['status' => 'completed', 'cashier' => $budi->id])->assertSee($budiSale->invoice_no)->assertDontSee($voided->invoice_no);
 });
+
+test('the transaction list totals the filtered sales and leaves voided ones out of the revenue', function () {
+    checkout($this->cashier, [[$this->latte, 1]]);                       // Rp25.000
+    checkout($this->cashier, [[$this->americano, 2]]);                   // Rp36.000
+    $voided = checkout($this->cashier, [[$this->americano, 1]]);         // Rp18.000, voided
+    app(SaleService::class)->void($voided, $this->owner, 'Salah input');
+
+    $this->actingAs($this->owner)
+        ->get(route('owner.sales.index'))
+        ->assertOk()
+        ->assertSeeInOrder(['3 transaksi', '2 selesai senilai', 'Rp61.000', '1 void (tidak dihitung)']);
+});

@@ -1,32 +1,38 @@
 <x-owner-layout title="Ubah Menu">
-    <div class="mx-auto grid max-w-5xl gap-6 xl:grid-cols-2">
+    <div class="grid max-w-5xl gap-6 xl:grid-cols-2">
         <x-card class="p-6">
-            <h2 class="mb-4 text-center text-base font-semibold">Data menu</h2>
+            <h2 class="mb-4 text-base font-semibold">Data menu</h2>
             <form novalidate method="POST" action="{{ route('owner.products.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
                 @include('owner.products._form')
 
-                <div class="flex items-center justify-center gap-3">
+                <div class="flex items-center gap-3">
                     <x-primary-button>Simpan</x-primary-button>
                     <a href="{{ route('owner.products.index') }}" class="text-sm text-stone-600 hover:underline">Kembali</a>
                 </div>
             </form>
         </x-card>
 
-        <x-card id="resep" class="p-6">
-            <h2 class="text-center text-base font-semibold">Resep per 1 porsi</h2>
-            <p class="mt-1 text-center text-sm text-stone-600">Jumlah dalam satuan dasar bahan. Stok dikurangi sesuai resep setiap kali menu terjual.</p>
+        <x-card id="resep" class="p-6" x-data="{ dirty: false }">
+            <h2 class="text-base font-semibold">Resep per 1 porsi</h2>
+            <p class="mt-1 text-sm text-stone-600">Jumlah dalam satuan dasar bahan. Stok dikurangi sesuai resep setiap kali menu terjual.</p>
 
             @if ($product->recipes->isEmpty())
-                <p class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
+                <p class="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
                     Belum ada resep. Menu tanpa resep tidak akan tampil di kasir.
                 </p>
             @else
+                {{-- All quantities save together through one form; each row's delete is its own form, so the
+                     inputs join the save form via the form="" attribute instead of nesting forms. --}}
+                <form novalidate id="recipe-quantities" method="POST" action="{{ route('owner.products.recipes.update-all', $product) }}">
+                    @csrf
+                    @method('PUT')
+                </form>
                 <ul class="mt-4 divide-y divide-stone-100 border-y border-stone-100">
                     @foreach ($product->recipes as $recipe)
-                        @php($rowErrors = $errors->getBag('recipe-'.$recipe->id))
+                        @php($field = 'quantities.'.$recipe->id)
                         <li class="flex flex-wrap items-center gap-3 py-3">
                             <span class="min-w-0 flex-1 font-medium">
                                 {{ $recipe->ingredient->name }}
@@ -34,26 +40,28 @@
                                     <span class="ml-1 rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700">Nonaktif</span>
                                 @endunless
                             </span>
-                            <form novalidate method="POST" action="{{ route('owner.products.recipes.update', [$product, $recipe]) }}" class="flex items-center gap-2">
-                                @csrf
-                                @method('PUT')
+                            <div class="flex items-center gap-2">
                                 <label for="qty-{{ $recipe->id }}" class="sr-only">Jumlah {{ $recipe->ingredient->name }}</label>
-                                <x-text-input id="qty-{{ $recipe->id }}" name="quantity" type="number" min="0.01" step="0.01" inputmode="decimal"
-                                              class="w-24 text-right text-sm" required
-                                              value="{{ $rowErrors->any() ? old('quantity') : (float) $recipe->quantity }}" />
-                                <span class="w-10 text-sm text-stone-500">{{ $recipe->ingredient->unit->label() }}</span>
-                                <x-secondary-button type="submit" class="!px-3">Simpan</x-secondary-button>
-                            </form>
+                                <x-text-input id="qty-{{ $recipe->id }}" name="quantities[{{ $recipe->id }}]" form="recipe-quantities"
+                                              type="number" min="0.01" step="0.01" inputmode="decimal"
+                                              class="w-24 text-right text-sm" required x-on:input="dirty = true"
+                                              value="{{ old($field, (float) $recipe->quantity) }}" />
+                                <span class="w-10 text-sm text-stone-600">{{ $recipe->ingredient->unit->label() }}</span>
+                            </div>
                             <x-confirm-form :action="route('owner.products.recipes.destroy', [$product, $recipe])" method="DELETE"
                                             :title="'Hapus '.$recipe->ingredient->name.' dari resep?'"
                                             message="Transaksi berikutnya tidak lagi mengurangi stok bahan ini untuk menu ini. Anda bisa menambahkannya kembali kapan saja."
                                             confirm="Hapus dari resep">
                                 <button type="submit" class="text-sm font-medium text-red-600 hover:underline">Hapus</button>
                             </x-confirm-form>
-                            <x-input-error :messages="$rowErrors->get('quantity')" class="w-full text-right" />
+                            <x-input-error :messages="$errors->get($field)" class="w-full text-right" />
                         </li>
                     @endforeach
                 </ul>
+                <div class="mt-4 flex flex-wrap items-center gap-3">
+                    <x-secondary-button type="submit" form="recipe-quantities">Simpan resep</x-secondary-button>
+                    <p x-show="dirty" x-cloak class="text-sm text-amber-800" aria-live="polite">Ada perubahan jumlah yang belum disimpan.</p>
+                </div>
             @endif
 
             @if ($availableIngredients->isNotEmpty())

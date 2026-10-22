@@ -10,10 +10,10 @@
         $card = 'rounded-2xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]';
     @endphp
 
-    <div class="mx-auto max-w-6xl space-y-6">
+    <div class="max-w-6xl space-y-6">
         {{-- Range --}}
         <form novalidate method="GET" action="{{ route('owner.reports.index') }}"
-              class="{{ $card }} flex flex-wrap items-end justify-center gap-3 px-6 py-4">
+              class="{{ $card }} flex flex-wrap items-end gap-3 px-6 py-4">
             <div>
                 <x-input-label for="from" value="Dari tanggal" />
                 <x-text-input id="from" name="from" type="date" class="mt-1 h-10 text-sm" :value="$from->toDateString()" />
@@ -28,8 +28,8 @@
                 Ekspor Excel
             </x-link-button>
         </form>
-        <x-input-error :messages="$errors->get('from')" class="text-center" />
-        <x-input-error :messages="$errors->get('to')" class="text-center" />
+        <x-input-error :messages="$errors->get('from')" />
+        <x-input-error :messages="$errors->get('to')" />
 
         {{-- Summary --}}
         <section aria-labelledby="summary-title" class="{{ $card }}">
@@ -117,7 +117,7 @@
             {{-- Waste --}}
             <section aria-labelledby="waste-title" class="{{ $card }} p-6">
                 <div class="flex items-baseline justify-between gap-4">
-                    <h2 id="waste-title" class="text-base font-semibold">Nilai waste</h2>
+                    <h2 id="waste-title" class="text-base font-semibold">Nilai bahan terbuang</h2>
                     <p class="reveal text-2xl font-bold tabular-nums" style="--i: 3">{{ rupiah($waste['total'], whole: true) }}</p>
                 </div>
 
@@ -138,7 +138,7 @@
                         @endforeach
                     </ul>
                 @endif
-                <p class="mt-4 text-xs text-stone-500">Dinilai dengan harga beli bahan saat waste dicatat.</p>
+                <p class="mt-4 text-xs text-stone-600">Dinilai dengan harga beli bahan saat dicatat terbuang.</p>
             </section>
         </div>
 
@@ -157,9 +157,20 @@
                 <p class="mt-4 rounded-xl bg-stone-50 px-4 py-10 text-center text-sm text-stone-600">Belum ada transaksi pada periode ini, jadi jam ramai belum bisa dihitung.</p>
             @else
                 <div class="relative mt-5 h-64">
+                    <x-chart-skeleton />
                     <canvas data-hourly-chart='@json($hourly)' data-busiest='@json($busiestHours)'
-                            role="img" aria-label="Grafik jumlah transaksi per jam, {{ $period }}"></canvas>
+                            role="img" aria-label="Grafik jumlah transaksi per jam, {{ $period }}. Angkanya ada di tabel setelah grafik."></canvas>
                 </div>
+                <table class="sr-only">
+                    <caption>Transaksi per jam, {{ $period }}</caption>
+                    <thead><tr><th scope="col">Jam</th><th scope="col">Transaksi</th><th scope="col">Omzet</th></tr></thead>
+                    <tbody>
+                        @foreach ($hourly as $hour)
+                            @continue($hour['transactions'] === 0)
+                            <tr><td>{{ sprintf('%02d.00', $hour['hour']) }}</td><td>{{ $hour['transactions'] }}</td><td>{{ rupiah($hour['revenue'], whole: true) }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </section>
 

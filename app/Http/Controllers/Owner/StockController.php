@@ -15,7 +15,11 @@ class StockController extends Controller
     public function index(): View
     {
         return view('owner.stock.index', [
-            'ingredients' => Ingredient::orderBy('name')->paginate(25),
+            // Most urgent first: out of stock, then below minimum, then the rest; A–Z within each group.
+            'ingredients' => Ingredient::query()
+                ->orderByRaw('CASE WHEN current_stock <= 0 THEN 0 WHEN current_stock < min_stock THEN 1 ELSE 2 END')
+                ->orderBy('name')
+                ->paginate(25),
             // Over all ingredients, not just this page.
             'totalValue' => (string) (Ingredient::query()->selectRaw('COALESCE(SUM(current_stock * cost_per_unit), 0) as total')->value('total') ?? '0'),
         ]);
