@@ -1,5 +1,5 @@
 <x-owner-layout title="Transaksi">
-    <form method="GET" action="{{ route('owner.sales.index') }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
+    <form novalidate method="GET" action="{{ route('owner.sales.index') }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
         <div>
             <x-input-label for="from" value="Dari tanggal" />
             <x-text-input id="from" name="from" type="date" class="mt-1 text-sm" :value="$filters['from'] ?? ''" />

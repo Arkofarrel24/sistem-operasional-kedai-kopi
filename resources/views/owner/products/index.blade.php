@@ -5,7 +5,7 @@
 
     @include('owner.partials.menu-tabs')
 
-    <form method="GET" action="{{ route('owner.products.index') }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
+    <form novalidate method="GET" action="{{ route('owner.products.index') }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
         <div>
             <x-input-label for="category" value="Kategori" />
             <x-select-input id="category" name="category" class="mt-1 text-sm">

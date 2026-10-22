@@ -33,10 +33,10 @@ class MasterDataSeeder extends Seeder
             'Gula Pasir' => [Unit::Gram, 5000, 1000, 16, true],
             'Bubuk Cokelat' => [Unit::Gram, 2000, 500, 120, true],
             'Bubuk Matcha' => [Unit::Gram, 250, 300, 450, true],     // below minimum, 50 portions
-            'Teh Hitam' => [Unit::Gram, 1000, 250, 150, true],
+            'Teh Hitam' => [Unit::Gram, 800, 250, 150, true],
             'Es Batu' => [Unit::Gram, 40000, 5000, 1, true],
             'Cup Plastik 16 oz' => [Unit::Pcs, 500, 100, 1200, true],
-            'Botol 1 L' => [Unit::Pcs, 60, 10, 4500, true],
+            'Botol 1 L' => [Unit::Pcs, 40, 10, 4500, true],
             'Sirup Karamel' => [Unit::Ml, 1000, 200, 60, false],     // inactive
         ])->map(fn (array $row, string $name) => $ingredientService->create(
             ['name' => $name, 'unit' => $row[0], 'min_stock' => $row[2], 'cost_per_unit' => $row[3], 'is_active' => $row[4]],

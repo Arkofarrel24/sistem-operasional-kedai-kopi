@@ -40,6 +40,9 @@ test('owner forms with required fields disable browser validation', function () 
         route('owner.stock.restock.create', $ingredient),
         route('owner.stock.adjustment.create', $ingredient),
         route('owner.stock.waste.create', $ingredient),
+        route('owner.reports.index'),
+        route('owner.products.index'),
+        route('owner.sales.index'),
         route('owner.sales.show', checkout(User::factory()->cashier()->create(), [[productWithRecipe('Espresso', 15000, [[stockedIngredient('Kopi', Unit::Gram, 100), 18]]), 1]])),
     ];
 

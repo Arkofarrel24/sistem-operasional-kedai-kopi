@@ -100,6 +100,9 @@ Integrasi pembayaran online, multi-outlet, order online pelanggan, manajemen sup
    Penyesuaian, waste, dan void tidak mengubah `cost_per_unit`.
 10. Setiap movement menyimpan `unit_cost` = harga beli per satuan saat itu (restock: harga beli restock; sale, adjustment, waste: `cost_per_unit` saat dicatat). `void_return` memakai `unit_cost` dari movement `sale` aslinya, sehingga HPP historis tetap akurat.
 11. Void mengembalikan tepat jumlah yang dikurangi saat checkout (dari movement `sale`, bukan dihitung ulang dari resep), dan transaksi yang sudah void tidak bisa di-void lagi.
+12. Transaksi void tidak dihitung di omzet, jumlah transaksi, rata-rata, rincian metode bayar, menu terlaris, penjualan per jam, maupun HPP.
+13. Semua pengelompokan tanggal dan jam memakai zona waktu Asia/Jakarta: timestamp disimpan dalam waktu Jakarta dan sesi database dikunci ke `+07:00`. Rentang tanggal laporan inklusif: tanggal akhir dihitung sampai 23:59:59.
+14. Angka laporan diagregasi di query database (SUM/COUNT/GROUP BY), bukan dengan memuat semua baris ke PHP. HPP = Σ (jumlah × `unit_cost`) dari movement `sale` milik transaksi selesai pada periode itu (bukan `cost_per_unit` saat ini); laba kotor = omzet − HPP; margin = laba kotor ÷ omzet. Nilai waste = Σ (jumlah × `unit_cost`) movement `waste` pada periode itu.
 
 ---
 
@@ -222,6 +225,7 @@ Struktur yang disarankan: logika stok dan transaksi di service class (`app/Servi
 - ±12 bahan dengan resep lengkap untuk semua menu.
 - ±30 hari transaksi dummy dengan pola realistis: ramai jam 07–09 dan 15–17, akhir pekan lebih ramai, 2–3 bahan sengaja di bawah stok minimum.
 - Seeder transaksi harus melewati `SaleService` agar stok dan `stock_movements` konsisten.
+- Restock, waste, dan void di seeder juga melewati `StockService`/`SaleService`, dengan jam aplikasi dimundurkan ke waktu kejadian; `php artisan stock:verify` harus konsisten setelah seeding.
 
 ---
 
@@ -233,8 +237,8 @@ Struktur yang disarankan: logika stok dan transaksi di service class (`app/Servi
 | **1. Master data** | Migrasi + model + CRUD kategori, menu, bahan, resep; middleware peran | Owner bisa input menu lengkap dengan resep |
 | **2. POS** | Halaman kasir, keranjang, pembayaran, invoice, struk; `SaleService` + `StockService` | Transaksi tersimpan dan stok berkurang sesuai resep; stok kurang → ditolak |
 | **3. Stok** | Restock, penyesuaian/waste, riwayat pergerakan, void transaksi | Semua perubahan stok tercatat; void mengembalikan stok |
-| **4. Dashboard & laporan** | Ringkasan, peringatan restock, grafik, laporan + ekspor Excel | Angka laporan cocok dengan data transaksi |
-| **5. Seeder & tes** | Data dummy 30 hari, tes fitur inti | `php artisan migrate:fresh --seed` menghasilkan demo yang hidup; tes lulus |
+| **4. Dashboard & laporan** | Data dummy 30 hari (dimajukan dari Fase 5), ringkasan, peringatan restock, grafik, laporan + ekspor Excel | `php artisan migrate:fresh --seed` menghasilkan demo yang hidup; angka laporan cocok dengan data transaksi |
+| **5. Tes & polesan** | Melengkapi tes fitur inti, perbaikan dari hasil uji coba | Tes lulus |
 | **6. Deploy & dokumentasi** | Deploy demo online, README, akun demo | Bisa dibuka dari HP dengan akun demo |
 
 Tes minimal yang wajib ada:

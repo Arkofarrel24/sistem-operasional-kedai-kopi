@@ -59,6 +59,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Pin the session to Asia/Jakarta (no DST) so DATE()/HOUR() in report queries group by
+            // Jakarta days and hours regardless of the server's time zone (PLAN.md rule 13).
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],

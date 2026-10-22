@@ -45,3 +45,68 @@ textarea {
         box-shadow: none;
     }
 }
+
+/*
+ * Motion tokens (owner dashboard & reports). Strong ease-out: fast start, gentle settle.
+ * Load-in effects run once per page view; everything degrades to static under reduced motion.
+ */
+:root {
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Press feedback for buttons and pressable controls. */
+.press {
+    transition: transform 160ms var(--ease-out), background-color 150ms ease, color 150ms ease;
+}
+
+.press:active {
+    transform: scale(0.97);
+}
+
+/* Segmented control: the white thumb slides to the selected option. */
+.segmented-thumb {
+    transition: transform 240ms var(--ease-out);
+}
+
+.segmented[data-selected='1'] .segmented-thumb {
+    transform: translateX(100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* Key figures settle in: a small rise with a blur that clears. Stagger with style="--i: n". */
+    .reveal {
+        animation: reveal 520ms var(--ease-out) backwards;
+        animation-delay: calc(var(--i, 0) * 70ms);
+    }
+
+    /* Data bars grow from their start, so the eye reads them as amounts. */
+    .grow-x {
+        transform-origin: left center;
+        animation: grow-x 700ms var(--ease-out) backwards;
+        animation-delay: calc(120ms + var(--i, 0) * 50ms);
+    }
+
+    @keyframes reveal {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+            filter: blur(3px);
+        }
+    }
+
+    @keyframes grow-x {
+        from {
+            transform: scaleX(0);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .press:active {
+        transform: none;
+    }
+
+    .segmented-thumb {
+        transition: none;
+    }
+}

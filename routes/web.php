@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Owner\CategoryController;
+use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\IngredientController;
 use App\Http\Controllers\Owner\ProductController;
 use App\Http\Controllers\Owner\RecipeController;
+use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\Owner\RestockController;
 use App\Http\Controllers\Owner\SaleController as OwnerSaleController;
 use App\Http\Controllers\Owner\StockAdjustmentController;
@@ -27,7 +29,7 @@ Route::middleware(['auth', 'role:owner'])
     ->prefix('owner')
     ->name('owner.')
     ->group(function () {
-        Route::view('/dashboard', 'owner.dashboard')->name('dashboard');
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
         // Master data. Products and ingredients are deactivated/kept rather than deleted (history refers to them).
         Route::resource('categories', CategoryController::class)->except('show');
@@ -51,7 +53,8 @@ Route::middleware(['auth', 'role:owner'])
         Route::post('/sales/{sale}/void', VoidSaleController::class)->name('sales.void');
 
         // Placeholders until the related phases are built.
-        Route::view('/reports', 'owner.placeholder', ['title' => 'Laporan'])->name('reports.index');
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
         Route::view('/users', 'owner.placeholder', ['title' => 'Pengguna'])->name('users.index');
     });
 

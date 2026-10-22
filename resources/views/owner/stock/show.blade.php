@@ -7,7 +7,7 @@
         @include('owner.stock._summary')
     </div>
 
-    <form method="GET" action="{{ route('owner.stock.show', $ingredient) }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
+    <form novalidate method="GET" action="{{ route('owner.stock.show', $ingredient) }}" class="mb-4 flex flex-wrap items-end justify-center gap-3">
         <div>
             <x-input-label for="type" value="Jenis" />
             <x-select-input id="type" name="type" class="mt-1 text-sm">
