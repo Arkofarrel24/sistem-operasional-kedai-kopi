@@ -4,7 +4,7 @@ Kedai kopi kecil biasanya mencatat penjualan di nota dan chat WhatsApp, tidak ta
 
 ![Dashboard pemilik](docs/screenshots/07-dashboard.png)
 
-**Video demo (±1,5 menit):** [Tonton di YouTube](https://youtu.be/GANTI-DENGAN-LINK-VIDEO) · atau putar berkas lokal [`docs/demo.mp4`](docs/demo.mp4)
+**Video demo (±1,5 menit):** Putar [`docs/demo.mp4`](docs/demo.mp4)
 
 > Proyek portofolio berbasis studi kasus. Cerita lengkapnya (masalah, analisis, solusi, hasil) ada di [docs/STUDI-KASUS.md](docs/STUDI-KASUS.md).
 
